@@ -1,7 +1,7 @@
 # PWP SPRING 2023
 # PROJECT NAME
 # Group information
-* Student 1. Name and email
+* Student 1. Jouni Annamaa jannamaa19@student.oulu.fi
 * Student 2. Name and email
 * Student 3. Name and email
 * Student 4. Name and email
