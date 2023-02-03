@@ -1,10 +1,25 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
+
+if __name__ == "__main__":
+    app = Flask(__name__)
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    db = SQLAlchemy(app)
+else:
+    db = SQLAlchemy() # If imported, don't pass app app object to allow for create_test_app()
+
+
+# Create separate database for testing
+def create_test_app():
+    app = Flask(__name__)
+    app.config['TESTING'] = True
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///pytest.db"
+    db.init_app(app)
+    app.app_context().push()
+    return app, db
+
 
 #table for exercise information (exercise name, duration in minutes, date, user id as foreign key)
 class Exercise(db.Model):

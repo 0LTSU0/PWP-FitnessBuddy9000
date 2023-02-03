@@ -1,14 +1,14 @@
 # Meetings notes
 
 ## Meeting 1.
-* **DATE:**
-* **ASSISTANTS:**
+* 2.2.2023
+* Mika Oja
 
 ### Minutes
-*Summary of what was discussed during the meeting*
+Plan discussed, things mostly fine, only some lack of details in related work and diagram for concepts was somewhat messy with too much detail (different actions)
 
 ### Action points
-*List here the actions points discussed with assistants*
+Plan seems good in terms of scope and complexity -> work can continue
 
 
 

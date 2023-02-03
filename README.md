@@ -2,7 +2,7 @@
 # PROJECT NAME
 # Group information
 * Student 1. Jouni Annamaa jannamaa19@student.oulu.fi
-* Student 2. Name and email
+* Student 2. Lauri Sundelin lsundeli19@student.oulu.fi
 * Student 3. Name and email
 * Student 4. Name and email
 

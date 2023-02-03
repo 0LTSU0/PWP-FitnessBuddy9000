@@ -1,0 +1,50 @@
+{
+    "Users": [
+        {"date": "01/01/23 01:00:00", "name": "name1", "email": "some1@email.com", "age": 21},
+        {"date": "02/01/23 02:00:00", "name": "name2", "email": "some2@email.com", "age": 22},
+        {"date": "03/01/23 03:00:00", "name": "name3", "email": "some3@email.com", "age": 23},
+        {"date": "04/01/23 04:00:00", "name": "name4", "email": "some4@email.com", "age": 24},
+        {"date": "05/01/23 05:00:00", "name": "name5", "email": "some5@email.com", "age": 25},
+        {"date": "06/01/23 06:00:00", "name": "name6", "email": "some6@email.com", "age": 26},
+        {"date": "07/01/23 07:00:00", "name": "name7", "email": "some7@email.com", "age": 27},
+        {"date": "08/01/23 08:00:00", "name": "name8", "email": "some8@email.com", "age": 28},
+        {"date": "09/01/23 09:00:00", "name": "name9", "email": "some9@email.com", "age": 29},
+        {"date": "10/01/23 10:00:00", "name": "name10", "email": "some10@email.com", "age": 30}
+    ],
+    "Exercise_record": [
+        {"date": "10/01/23 11:00:00", "name": "laji1", "duration": 100, "user_id": 1},
+        {"date": "11/01/23 12:00:00", "name": "laji2", "duration": 200, "user_id": 1},
+        {"date": "12/01/23 13:00:00", "name": "laji3", "duration": 300, "user_id": 2},
+        {"date": "13/01/23 14:00:00", "name": "laji4", "duration": 400, "user_id": 2},
+        {"date": "14/01/23 15:00:00", "name": "laji5", "duration": 500, "user_id": 3},
+        {"date": "15/01/23 16:00:00", "name": "laji6", "duration": 600, "user_id": 3},
+        {"date": "16/01/23 17:00:00", "name": "laji7", "duration": 700, "user_id": 4},
+        {"date": "17/01/23 18:00:00", "name": "laji8", "duration": 800, "user_id": 4},
+        {"date": "18/01/23 19:00:00", "name": "laji9", "duration": 900, "user_id": 5},
+        {"date": "19/01/23 20:00:00", "name": "laji10", "duration": 1000, "user_id": 5},
+        {"date": "20/01/23 21:00:00", "name": "laji11", "duration": 100, "user_id": 6},
+        {"date": "21/01/23 22:00:00", "name": "laji12", "duration": 200, "user_id": 6},
+        {"date": "22/01/23 23:00:00", "name": "laji13", "duration": 300, "user_id": 7},
+        {"date": "23/01/23 00:00:00", "name": "laji14", "duration": 400, "user_id": 7},
+        {"date": "24/01/23 01:00:00", "name": "laji15", "duration": 500, "user_id": 8},
+        {"date": "25/01/23 02:00:00", "name": "laji16", "duration": 600, "user_id": 8}
+    ],
+    "Measurements": [
+        {"date":"01/01/23 01:00:00", "weight": 10.1, "calories_in": 1000, "calories_out": 100, "user_id": 3},
+        {"date":"02/01/23 01:00:00", "weight": 20.2, "calories_in": 1100, "calories_out": 200, "user_id": 3},
+        {"date":"03/01/23 01:00:00", "weight": 30.3, "calories_in": 1200, "calories_out": 300, "user_id": 4},
+        {"date":"04/01/23 01:00:00", "weight": 40.4, "calories_in": 1300, "calories_out": 400, "user_id": 4},
+        {"date":"05/01/23 01:00:00", "weight": 50.5, "calories_in": 1400, "calories_out": 500, "user_id": 5},
+        {"date":"06/01/23 01:00:00", "weight": 60.6, "calories_in": 1500, "calories_out": 600, "user_id": 5},
+        {"date":"07/01/23 01:00:00", "weight": 70.7, "calories_in": 1600, "calories_out": 700, "user_id": 6},
+        {"date":"08/01/23 01:00:00", "weight": 80.8, "calories_in": 1700, "calories_out": 800, "user_id": 6},
+        {"date":"09/01/23 01:00:00", "weight": 90.9, "calories_in": 1800, "calories_out": 900, "user_id": 7},
+        {"date":"10/01/23 01:00:00", "weight": 100.1, "calories_in": 1900, "calories_out": 1000, "user_id": 7},
+        {"date":"11/01/23 01:00:00", "weight": 200.2, "calories_in": 2000, "calories_out": 1100, "user_id": 8},
+        {"date":"12/01/23 01:00:00", "weight": 300.3, "calories_in": 2100, "calories_out": 1200, "user_id": 8},
+        {"date":"13/01/23 01:00:00", "weight": 400.4, "calories_in": 2200, "calories_out": 1300, "user_id": 9},
+        {"date":"14/01/23 01:00:00", "weight": 500.5, "calories_in": 2300, "calories_out": 1400, "user_id": 9},
+        {"date":"15/01/23 01:00:00", "weight": 600.6, "calories_in": 2400, "calories_out": 1500, "user_id": 10},
+        {"date":"16/01/23 01:00:00", "weight": 700.7, "calories_in": 2500, "calories_out": 1600, "user_id": 10}
+    ]
+}
