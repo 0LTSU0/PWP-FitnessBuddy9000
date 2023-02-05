@@ -9,7 +9,7 @@ def populate_database(db, app):
         with open(os.path.join(__file__.rstrip("populate_database.py"), "dummy_data.json"), "r") as f:
             dummy_data = json.load(f)
             for user in dummy_data.get("Users"):
-                entry = User(name=user.get("name"), email=user.get("email"), age=user.get("age"), creation_date=datetime.datetime.strptime(user.get("date"), "%d/%m/%y %H:%M:%S"))
+                entry = User(name=user.get("name"), email=user.get("email"), age=user.get("age"), user_creation_date=datetime.datetime.strptime(user.get("date"), "%d/%m/%y %H:%M:%S"))
                 db.session.add(entry)
             db.session.commit()
             for exercise in dummy_data.get("Exercise_record"):
@@ -22,6 +22,6 @@ def populate_database(db, app):
             db.session.commit()
             
             return True
-            
+
     except Exception:
         return False
