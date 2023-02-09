@@ -4,6 +4,7 @@ import tools.populate_database
 import datetime
 import json
 import pathlib
+import time
 
 
 def test_database_models():
@@ -65,3 +66,6 @@ def test_database_models():
     assert test_user_record.measurements == []
     
     db.drop_all()
+
+
+
