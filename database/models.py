@@ -27,9 +27,9 @@ def create_test_app():
 class Exercise(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
-    duration = db.Column(db.Integer, nullable=False)
+    duration = db.Column(db.Float, nullable=True)
     date = db.Column(db.DateTime, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="SET NULL"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     #initialize relationship
     user = db.relationship("User", back_populates="exercise")
@@ -39,7 +39,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(64), nullable=False)
-    age = db.Column(db.Integer, nullable=False)
+    age = db.Column(db.Float, nullable=False)
     user_creation_date = db.Column(db.DateTime, nullable=False)
 
     #initialize relationships
@@ -50,10 +50,10 @@ class User(db.Model):
 class Measurements(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)
-    weight = db.Column(db.Float, nullable=False)
-    calories_in = db.Column(db.Integer, nullable=False)
-    calories_out = db.Column(db.Integer, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="SET NULL"))
+    weight = db.Column(db.Float, nullable=True)
+    calories_in = db.Column(db.Float, nullable=True)
+    calories_out = db.Column(db.Float, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     #initialize relationship
     user = db.relationship("User", back_populates="measurements")
