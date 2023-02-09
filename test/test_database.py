@@ -7,6 +7,16 @@ import pathlib
 import time
 
 
+def insert_with_null(db, entry):
+    try:
+        db.session.add(entry)
+        db.session.commit()
+        return False
+    except Exception:
+        db.session.rollback()
+        return True
+        
+
 def test_database_models():
     app, db = create_test_app()
     db.create_all()
@@ -68,7 +78,6 @@ def test_database_models():
     db.drop_all()
 
 
-
 def test_ondeletes():
     app, db = create_test_app()
     db.create_all()
@@ -97,4 +106,47 @@ def test_ondeletes():
     for entry in Exercise.query.filter_by(user_id=3).all():
         assert entry.user == None
 
+    db.drop_all()
+
+
+def test_nullability():
+    app, db = create_test_app()
+    db.create_all()
+
+    #Test User
+    user_entry = {"date": "01/01/23 01:00:00", "name": "name1", "email": "some1@email.com", "age": 21}
+    entry = User(name=None, email=user_entry.get("email"), age=user_entry.get("age"), user_creation_date=datetime.datetime.strptime(user_entry.get("date"), "%d/%m/%y %H:%M:%S"))
+    assert insert_with_null(db, entry)
+    entry = User(name=user_entry.get("name"), email=None, age=user_entry.get("age"), user_creation_date=datetime.datetime.strptime(user_entry.get("date"), "%d/%m/%y %H:%M:%S"))
+    assert insert_with_null(db, entry)
+    entry = User(name=user_entry.get("name"), email=user_entry.get("email"), age=None, user_creation_date=datetime.datetime.strptime(user_entry.get("date"), "%d/%m/%y %H:%M:%S"))
+    assert insert_with_null(db, entry)
+    entry = User(name=user_entry.get("name"), email=user_entry.get("email"), age=user_entry.get("age"), user_creation_date=None)
+    assert insert_with_null(db, entry)
+
+    #Create a valid user to use with excercise/measurements
+    entry = User(name=user_entry.get("name"), email=user_entry.get("email"), age=user_entry.get("age"), user_creation_date=datetime.datetime.strptime(user_entry.get("date"), "%d/%m/%y %H:%M:%S"))
+    db.session.add(entry)
+    db.session.commit()
+
+    #Test Measurement
+    measurement_entry = {"date":"01/01/23 01:00:00", "weight": 10.1, "calories_in": 1000, "calories_out": 100, "user_id": 1}
+    entry = Measurements(weight=None, calories_in=measurement_entry.get("calories_in"), calories_out=measurement_entry.get("calories_out"), date=datetime.datetime.strptime(measurement_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=measurement_entry.get("user_id"))
+    assert insert_with_null(db, entry)
+    entry = Measurements(weight=measurement_entry.get("weight"), calories_in=None, calories_out=measurement_entry.get("calories_out"), date=datetime.datetime.strptime(measurement_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=measurement_entry.get("user_id"))
+    assert insert_with_null(db, entry)
+    entry = Measurements(weight=measurement_entry.get("weight"), calories_in=measurement_entry.get("calories_in"), calories_out=None, date=datetime.datetime.strptime(measurement_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=measurement_entry.get("user_id"))
+    assert insert_with_null(db, entry)
+    entry = Measurements(weight=measurement_entry.get("weight"), calories_in=measurement_entry.get("calories_in"), calories_out=measurement_entry.get("calories_out"), date=None, user_id=measurement_entry.get("user_id"))
+    assert insert_with_null(db, entry)
+
+    #Test Excercise
+    excercise_entry = {"date": "10/01/23 11:00:00", "name": "laji1", "duration": 100, "user_id": 1}
+    entry = Exercise(name=None, duration=excercise_entry.get("duration"), date=datetime.datetime.strptime(excercise_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=excercise_entry.get("user_id"))
+    assert insert_with_null(db, entry)
+    entry = Exercise(name=excercise_entry.get("name"), duration=None, date=datetime.datetime.strptime(excercise_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=excercise_entry.get("user_id"))
+    assert insert_with_null(db, entry)
+    entry = Exercise(name=excercise_entry.get("name"), duration=excercise_entry.get("duration"), date=None, user_id=excercise_entry.get("user_id"))
+    assert insert_with_null(db, entry)
+    
     db.drop_all()
