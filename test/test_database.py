@@ -69,3 +69,32 @@ def test_database_models():
 
 
 
+def test_ondeletes():
+    app, db = create_test_app()
+    db.create_all()
+
+    tools.populate_database.populate_database(db, app)
+
+    #Check that Measurements and Excercies are correctly linked to userid 3
+    for entry in Measurements.query.filter_by(user_id=3).all():
+        assert entry.user.name == "name3"
+        assert entry.user.email == "some3@email.com"
+        assert entry.user.age == 23
+        assert entry.user.user_creation_date == datetime.datetime.strptime("03/01/23 03:00:00", "%d/%m/%y %H:%M:%S")
+    for entry in Exercise.query.filter_by(user_id=3).all():
+        assert entry.user.name == "name3"
+        assert entry.user.email == "some3@email.com"
+        assert entry.user.age == 23
+        assert entry.user.user_creation_date == datetime.datetime.strptime("03/01/23 03:00:00", "%d/%m/%y %H:%M:%S")
+
+    #Delete User 3
+    User.query.filter_by(id=3).delete()
+    db.session.commit()
+    
+    #All references to user 3 should be nulled
+    for entry in Exercise.query.filter_by(user_id=3).all():
+        assert entry.user == None
+    for entry in Exercise.query.filter_by(user_id=3).all():
+        assert entry.user == None
+
+    db.drop_all()
