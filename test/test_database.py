@@ -4,19 +4,20 @@ import tools.populate_database
 import datetime
 import json
 import pathlib
-import time
 
 
-def insert_with_null(db, entry):
+# Helper function to make sure some illegal insert throws an error
+def insert_illegal(db, entry):
     try:
         db.session.add(entry)
         db.session.commit()
         return False
-    except Exception:
+    except Exception as e:
         db.session.rollback()
         return True
-        
 
+
+# Test all core database functionality
 def test_database_models():
     app, db = create_test_app()
     db.create_all()
@@ -109,6 +110,7 @@ def test_ondeletes():
     db.drop_all()
 
 
+# Test all nullability constraints
 def test_nullability():
     app, db = create_test_app()
     db.create_all()
@@ -116,13 +118,13 @@ def test_nullability():
     #Test User
     user_entry = {"date": "01/01/23 01:00:00", "name": "name1", "email": "some1@email.com", "age": 21}
     entry = User(name=None, email=user_entry.get("email"), age=user_entry.get("age"), user_creation_date=datetime.datetime.strptime(user_entry.get("date"), "%d/%m/%y %H:%M:%S"))
-    assert insert_with_null(db, entry)
+    assert insert_illegal(db, entry)
     entry = User(name=user_entry.get("name"), email=None, age=user_entry.get("age"), user_creation_date=datetime.datetime.strptime(user_entry.get("date"), "%d/%m/%y %H:%M:%S"))
-    assert insert_with_null(db, entry)
+    assert insert_illegal(db, entry)
     entry = User(name=user_entry.get("name"), email=user_entry.get("email"), age=None, user_creation_date=datetime.datetime.strptime(user_entry.get("date"), "%d/%m/%y %H:%M:%S"))
-    assert insert_with_null(db, entry)
+    assert insert_illegal(db, entry)
     entry = User(name=user_entry.get("name"), email=user_entry.get("email"), age=user_entry.get("age"), user_creation_date=None)
-    assert insert_with_null(db, entry)
+    assert insert_illegal(db, entry)
 
     #Create a valid user to use with excercise/measurements
     entry = User(name=user_entry.get("name"), email=user_entry.get("email"), age=user_entry.get("age"), user_creation_date=datetime.datetime.strptime(user_entry.get("date"), "%d/%m/%y %H:%M:%S"))
@@ -131,22 +133,56 @@ def test_nullability():
 
     #Test Measurement
     measurement_entry = {"date":"01/01/23 01:00:00", "weight": 10.1, "calories_in": 1000, "calories_out": 100, "user_id": 1}
-    entry = Measurements(weight=None, calories_in=measurement_entry.get("calories_in"), calories_out=measurement_entry.get("calories_out"), date=datetime.datetime.strptime(measurement_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=measurement_entry.get("user_id"))
-    assert insert_with_null(db, entry)
-    entry = Measurements(weight=measurement_entry.get("weight"), calories_in=None, calories_out=measurement_entry.get("calories_out"), date=datetime.datetime.strptime(measurement_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=measurement_entry.get("user_id"))
-    assert insert_with_null(db, entry)
-    entry = Measurements(weight=measurement_entry.get("weight"), calories_in=measurement_entry.get("calories_in"), calories_out=None, date=datetime.datetime.strptime(measurement_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=measurement_entry.get("user_id"))
-    assert insert_with_null(db, entry)
     entry = Measurements(weight=measurement_entry.get("weight"), calories_in=measurement_entry.get("calories_in"), calories_out=measurement_entry.get("calories_out"), date=None, user_id=measurement_entry.get("user_id"))
-    assert insert_with_null(db, entry)
+    assert insert_illegal(db, entry)
+    entry = Measurements(weight=measurement_entry.get("weight"), calories_in=measurement_entry.get("calories_in"), calories_out=None, date=datetime.datetime.strptime(measurement_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=None)
+    assert insert_illegal(db, entry)
 
     #Test Excercise
     excercise_entry = {"date": "10/01/23 11:00:00", "name": "laji1", "duration": 100, "user_id": 1}
     entry = Exercise(name=None, duration=excercise_entry.get("duration"), date=datetime.datetime.strptime(excercise_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=excercise_entry.get("user_id"))
-    assert insert_with_null(db, entry)
-    entry = Exercise(name=excercise_entry.get("name"), duration=None, date=datetime.datetime.strptime(excercise_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=excercise_entry.get("user_id"))
-    assert insert_with_null(db, entry)
+    assert insert_illegal(db, entry)
     entry = Exercise(name=excercise_entry.get("name"), duration=excercise_entry.get("duration"), date=None, user_id=excercise_entry.get("user_id"))
-    assert insert_with_null(db, entry)
+    assert insert_illegal(db, entry)
+    entry = Exercise(name=excercise_entry.get("name"), duration=excercise_entry.get("duration"), date=datetime.datetime.strptime(excercise_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=None)
+    assert insert_illegal(db, entry)
     
+    db.drop_all()
+
+
+# Test all fields where type restriction causes an error with wrong data (types: float, datetime)
+def test_restrictions():
+    app, db = create_test_app()
+    db.create_all()
+
+    #User
+    user_entry = {"date": "01/01/23 01:00:00", "name": "name1", "email": "some1@email.com", "age": 21}
+    entry = User(name=user_entry.get("name"), email=user_entry.get("email"), age="asd", user_creation_date=datetime.datetime.strptime(user_entry.get("date"), "%d/%m/%y %H:%M:%S"))
+    assert insert_illegal(db, entry)
+    entry = User(name=user_entry.get("name"), email=user_entry.get("email"), age=123, user_creation_date="asd")
+    assert insert_illegal(db, entry)
+
+    #Valid user to test excercise and measurement
+    entry = User(name=user_entry.get("name"), email=user_entry.get("email"), age=user_entry.get("age"), user_creation_date=datetime.datetime.strptime(user_entry.get("date"), "%d/%m/%y %H:%M:%S"))
+    db.session.add(entry)
+    db.session.commit()
+
+    #Excercise
+    excercise_entry = {"date": "10/01/23 11:00:00", "name": "laji1", "duration": 100, "user_id": 1}
+    entry = Exercise(name=excercise_entry.get("name"), duration="asd", date=datetime.datetime.strptime(excercise_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=excercise_entry.get("user_id"))
+    assert insert_illegal(db, entry)
+    entry = Exercise(name=excercise_entry.get("name"), duration=excercise_entry.get("duration"), date="asd", user_id=excercise_entry.get("user_id"))
+    assert insert_illegal(db, entry)
+
+    #Measurement
+    measurement_entry = {"date":"01/01/23 01:00:00", "weight": 10.1, "calories_in": 1000, "calories_out": 100, "user_id": 1}
+    entry = Measurements(weight=measurement_entry.get("weight"), calories_in=measurement_entry.get("calories_in"), calories_out=measurement_entry.get("calories_out"), date="asd", user_id=measurement_entry.get("user_id"))
+    assert insert_illegal(db, entry)
+    entry = Measurements(weight="asd", calories_in=measurement_entry.get("calories_in"), calories_out=measurement_entry.get("calories_out"), date=datetime.datetime.strptime(measurement_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=measurement_entry.get("user_id"))
+    assert insert_illegal(db, entry)
+    entry = Measurements(weight=measurement_entry.get("weight"), calories_in="asd", calories_out=measurement_entry.get("calories_out"), date=datetime.datetime.strptime(measurement_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=measurement_entry.get("user_id"))
+    assert insert_illegal(db, entry)
+    entry = Measurements(weight=measurement_entry.get("weight"), calories_in=measurement_entry.get("calories_in"), calories_out="asd", date=datetime.datetime.strptime(measurement_entry.get("date"), "%d/%m/%y %H:%M:%S"), user_id=measurement_entry.get("user_id"))
+    assert insert_illegal(db, entry)
+
     db.drop_all()
