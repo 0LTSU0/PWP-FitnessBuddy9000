@@ -1,4 +1,4 @@
-from database.models import Exercise, User, Measurements
+from fitnessbuddy.models import Exercise, User, Measurements
 import datetime
 import os, json
 

@@ -1,8 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-
-
 db = SQLAlchemy()
 
 # Create database
@@ -29,7 +27,7 @@ class Exercise(db.Model):
     name = db.Column(db.String(64), nullable=False)
     duration = db.Column(db.Float, nullable=True)
     date = db.Column(db.DateTime, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="cascade"), nullable=False)
 
     #initialize relationship
     user = db.relationship("User", back_populates="exercise")
@@ -43,8 +41,8 @@ class User(db.Model):
     user_creation_date = db.Column(db.DateTime, nullable=False)
 
     #initialize relationships
-    measurements = db.relationship("Measurements", back_populates="user")
-    exercise = db.relationship("Exercise", back_populates="user")
+    measurements = db.relationship("Measurements", cascade="all, delete-orphan", back_populates="user")
+    exercise = db.relationship("Exercise", cascade="all, delete-orphan", back_populates="user")
 
 #table for daily measurements ( calories in/out, bodyweight, date, user id as foreign key)
 class Measurements(db.Model):
@@ -53,7 +51,7 @@ class Measurements(db.Model):
     weight = db.Column(db.Float, nullable=True)
     calories_in = db.Column(db.Float, nullable=True)
     calories_out = db.Column(db.Float, nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="cascade"), nullable=False)
 
     #initialize relationship
     user = db.relationship("User", back_populates="measurements")

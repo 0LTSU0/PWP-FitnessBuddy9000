@@ -1,5 +1,5 @@
 
-from database.models import Exercise, User, Measurements, create_test_app
+from fitnessbuddy.models import Exercise, User, Measurements, create_test_app
 import tools.populate_database
 import datetime
 import json
