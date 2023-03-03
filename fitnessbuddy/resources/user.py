@@ -42,7 +42,7 @@ class UserCollection(Resource):
         except IntegrityError:
             return Response(status=400)
 
-        return Response(status=201, headers={"location":url_for("api.useritem", user=user)})
+        return Response(status=201, headers={"location":str(url_for("api.useritem", user=user))})
 
 
 #resource for getting single user or modifying existing user

@@ -3,14 +3,14 @@ from werkzeug.exceptions import Forbidden, NotFound
 from fitnessbuddy.models import User, Measurements, Exercise
 
 class UserConverter(BaseConverter):
-    def to_python(self, name):
-        user = User.query.filter_by(name=name).first()
+    def to_python(self, id):
+        user = User.query.filter_by(id=id).first()
         if user is None:
             raise NotFound
         return user
         
     def to_url(self, user):
-        return user.name
+        return str(user.id)
 
 class MeasurementsConverter(BaseConverter):
     def to_python(self, date):

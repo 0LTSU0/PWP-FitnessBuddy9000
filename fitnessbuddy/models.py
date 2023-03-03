@@ -71,7 +71,7 @@ class Exercise(db.Model):
 #table for user information (name, email, age, creation date)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), nullable=False, unique=True)
+    name = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(64), nullable=False)
     age = db.Column(db.Float, nullable=False)
     user_creation_date = db.Column(db.DateTime, nullable=False)
