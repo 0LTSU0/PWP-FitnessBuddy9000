@@ -5,6 +5,7 @@ from flask_restful import Resource
 from fitnessbuddy.models import db, User
 from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
+from sqlalchemy.exc import IntegrityError
 
 #resource for getting all users or adding new user
 class UserCollection(Resource):
@@ -15,7 +16,7 @@ class UserCollection(Resource):
         #find all users and add them to the response
         for item in User.query.all():
             user_item = item.serialize()
-            body.append(user_item)
+            body["users"].append(user_item)
 
         #return users
         return Response(json.dumps(body), 200, mimetype="application/json")
@@ -36,9 +37,13 @@ class UserCollection(Resource):
 
         #add new user to database
         db.session.add(user)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:
+            return Response(status=400)
 
-        return Response(status=201, headers={"api.UserItem":url_for(UserItem,user=user)})
+        return Response(status=201, headers={"location":url_for("api.useritem", user=user)})
+
 
 #resource for getting single user or modifying existing user
 class UserItem(Resource):
@@ -57,7 +62,7 @@ class UserItem(Resource):
             raise BadRequest(description=str(e))
         
         user.deserialize(request.json)
-        return Response(status=204, headers={"api.UserItem":url_for(UserItem,user=user)})
+        return Response(status=204, headers={"location":url_for("api.useritem", user=user)})
     
     def delete(self, user):
         db.session.delete(user)

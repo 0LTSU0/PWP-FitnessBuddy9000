@@ -3,8 +3,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import click
 from flask.cli import with_appcontext
-
-db = SQLAlchemy()
+from fitnessbuddy import db
 
 # Create database
 def create_app():
@@ -72,7 +71,7 @@ class Exercise(db.Model):
 #table for user information (name, email, age, creation date)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), nullable=False)
+    name = db.Column(db.String(64), nullable=False, unique=True)
     email = db.Column(db.String(64), nullable=False)
     age = db.Column(db.Float, nullable=False)
     user_creation_date = db.Column(db.DateTime, nullable=False)
@@ -86,7 +85,7 @@ class User(db.Model):
             "name": self.name,
             "email": self.email,
             "age": self.age,
-            "user_creation_date": self.user_creation_date
+            "user_creation_date": datetime.isoformat(self.user_creation_date)
         }
 
     def deserialize(self, doc):

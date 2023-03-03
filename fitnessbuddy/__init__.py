@@ -1,6 +1,8 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+import click
+from flask.cli import with_appcontext
 
 db = SQLAlchemy()
 
@@ -21,8 +23,8 @@ def create_app(test_config=None):
         
     try:
         os.makedirs(app.instance_path)
-    except OSError:
-        pass
+    except OSError as e:
+        print(e)
 
 
     db.init_app(app)
@@ -37,3 +39,5 @@ def create_app(test_config=None):
     app.register_blueprint(api.api_bp)
     
     return app
+
+
