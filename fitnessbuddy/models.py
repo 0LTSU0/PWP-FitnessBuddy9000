@@ -38,8 +38,9 @@ class Exercise(db.Model):
         return{
             "name": self.name,
             "duration": self.duration,
-            "date": self.date,
-            "user_id": self.user_id
+            "date": datetime.isoformat(self.date),
+            "user_id": self.user_id,
+            "id": self.id
         }
     def deserialize(self, doc):
         self.name = doc["name"]
@@ -64,6 +65,10 @@ class Exercise(db.Model):
         }
         props["user_id"] = {
             "description": "User id",
+            "type": "number"
+        }
+        props["duration"] = {
+            "description": "Duration of exercise",
             "type": "number"
         }
         return schema

@@ -23,11 +23,11 @@ class MeasurementsConverter(BaseConverter):
         return measurement.date
 
 class ExerciseConverter(BaseConverter):
-    def to_python(self, name):
-        exercise = Exercise.query.filter_by(name=name).first()
+    def to_python(self, id):
+        exercise = Exercise.query.filter_by(id=id).first()
         if exercise is None:
             raise NotFound
         return exercise
         
     def to_url(self, exercise):
-        return exercise.name
+        return str(exercise.id)
