@@ -1,6 +1,8 @@
 from datetime import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+import click
+from flask.cli import with_appcontext
 
 db = SQLAlchemy()
 
@@ -162,3 +164,8 @@ class Measurements(db.Model):
             "type": "number"
         }
         return schema
+
+@click.command("init-db")
+@with_appcontext
+def init_db_command():
+    db.create_all()

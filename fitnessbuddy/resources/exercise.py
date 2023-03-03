@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from fitnessbuddy.api import api
+from flask import url_for
 from fitnessbuddy.models import db
 
 class ExerciseCollection(Resource):

@@ -1,0 +1,33 @@
+from werkzeug.routing import BaseConverter
+from werkzeug.exceptions import Forbidden, NotFound
+from fitnessbuddy.models import User, Measurements, Exercise
+
+class UserConverter(BaseConverter):
+    def to_python(self, name):
+        user = User.query.filter_by(name=name).first()
+        if user is None:
+            raise NotFound
+        return user
+        
+    def to_url(self, user):
+        return user.name
+
+class MeasurementsConverter(BaseConverter):
+    def to_python(self, date):
+        measurement = Measurements.query.filter_by(date=date).first()
+        if measurement is None:
+            raise NotFound
+        return measurement
+        
+    def to_url(self, measurement):
+        return measurement.date
+
+class ExerciseConverter(BaseConverter):
+    def to_python(self, name):
+        exercise = Exercise.query.filter_by(name=name).first()
+        if exercise is None:
+            raise NotFound
+        return exercise
+        
+    def to_url(self, exercise):
+        return exercise.name

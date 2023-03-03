@@ -1,6 +1,7 @@
 import json
-from flask_restful import Resource, Response, request
-from fitnessbuddy.api import api
+from flask import Response, request
+from flask import url_for
+from flask_restful import Resource
 from fitnessbuddy.models import db, User
 from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
@@ -37,7 +38,7 @@ class UserCollection(Resource):
         db.session.add(user)
         db.session.commit()
 
-        return Response(status=201, headers={"Location":api.url_for(UserItem,user=user)})
+        return Response(status=201, headers={"api.UserItem":url_for(UserItem,user=user)})
 
 #resource for getting single user or modifying existing user
 class UserItem(Resource):
@@ -56,7 +57,7 @@ class UserItem(Resource):
             raise BadRequest(description=str(e))
         
         user.deserialize(request.json)
-        return Response(status=204, headers={"Location":api.url_for(UserItem,user=user)})
+        return Response(status=204, headers={"api.UserItem":url_for(UserItem,user=user)})
     
     def delete(self, user):
         db.session.delete(user)
