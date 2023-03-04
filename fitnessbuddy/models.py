@@ -142,7 +142,8 @@ class Measurements(db.Model):
             "weight": self.weight,
             "calories_in": self.calories_in,
             "calories_out": self.calories_out,
-            "user_id": self.user_id
+            "user_id": self.user_id,
+            "id": self.id
         }
 
     def deserialize(self, doc):

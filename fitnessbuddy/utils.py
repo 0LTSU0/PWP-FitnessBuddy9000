@@ -13,14 +13,14 @@ class UserConverter(BaseConverter):
         return str(user.id)
 
 class MeasurementsConverter(BaseConverter):
-    def to_python(self, date):
-        measurement = Measurements.query.filter_by(date=date).first()
+    def to_python(self, id):
+        measurement = Measurements.query.filter_by(id=id).first()
         if measurement is None:
             raise NotFound
         return measurement
         
     def to_url(self, measurement):
-        return str(measurement.date)
+        return str(measurement.id)
 
 class ExerciseConverter(BaseConverter):
     def to_python(self, id):

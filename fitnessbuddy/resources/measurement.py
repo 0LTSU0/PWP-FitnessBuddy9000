@@ -45,13 +45,13 @@ class MeasurementsCollection(Resource):
         return Response(status=201, headers={"location":str(url_for("api.measurementsitem", user=measurement.user, measurements=measurement))})
 
 class MeasurementsItem(Resource):
-    def get(self, user, measurement):
-        if user != measurement.user:
+    def get(self, user, measurements):
+        if user != measurements.user:
             raise BadRequest(description="requested measurement does not correspond to requested user")
-        body = measurement.serialize()
+        body = measurements.serialize()
         return Response(json.dumps(body), 200, mimetype="application/json")
         
-    def put(self, user, measurement):
+    def put(self, user, measurements):
         #check that request is json
         if not request.json:
             raise UnsupportedMediaType
@@ -63,15 +63,15 @@ class MeasurementsItem(Resource):
         
         #update database entry
         try:
-            measurement.date = datetime.fromisoformat(request.json["date"])
-            measurement.weight = request.json["weight"]
-            measurement.calories_in = request.json["calories_in"]
-            measurement.calories_out = request.json["calories_out"]
-            measurement.user_id = user.user_id
+            measurements.date = datetime.fromisoformat(request.json["date"])
+            measurements.weight = request.json["weight"]
+            measurements.calories_in = request.json["calories_in"]
+            measurements.calories_out = request.json["calories_out"]
+            measurements.user_id = request.json["user_id"]
             db.session.commit()
         except Exception as e:
             return Response(str(e), status=400)
-        return Response(status=204, headers={"api.MeasurementsItem":url_for(MeasurementsItem,meausrement=measurement)})
+        return Response(status=204, headers={"location":str(url_for("api.measurementsitem", user=measurements.user, measurements=measurements))})
     
     def delete(self, user,  measurement):
         db.session.delete(measurement)
