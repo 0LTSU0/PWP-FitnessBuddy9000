@@ -42,6 +42,8 @@ class ExerciseCollection(Resource):
 
 class ExerciseItem(Resource):
     def get(self, user, exercise):
+        if user != exercise.user:
+            raise BadRequest(description="requested exercise does not correspond to requested user")
         body = exercise.serialize()
         return Response(json.dumps(body), 200, mimetype="application/json")
 
