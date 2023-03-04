@@ -31,7 +31,8 @@ def create_test_app():
 
 class Exercise(db.Model):
     """
-    Database model for exercise information (exercise name, duration in minutes, date, user id as foreign key)
+    Database model for exercise information
+    (exercise name, duration in minutes, date, user id as foreign key)
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
@@ -155,7 +156,8 @@ class User(db.Model):
 
 class Measurements(db.Model):
     """
-    Database model for daily measurements ( calories in/out, bodyweight, date, user id as foreign key)
+    Database model for daily measurements
+    (calories in/out, bodyweight, date, user id as foreign key)
     """
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)

@@ -5,10 +5,10 @@ import json
 from datetime import datetime
 from flask import Response, request, url_for
 from flask_restful import Resource
-from fitnessbuddy.models import db, User
 from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
 from sqlalchemy.exc import IntegrityError
+from fitnessbuddy.models import db, User
 
 
 class UserCollection(Resource):
