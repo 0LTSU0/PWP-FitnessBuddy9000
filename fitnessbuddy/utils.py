@@ -20,7 +20,7 @@ class MeasurementsConverter(BaseConverter):
         return measurement
         
     def to_url(self, measurement):
-        return measurement.date
+        return str(measurement.date)
 
 class ExerciseConverter(BaseConverter):
     def to_python(self, id):

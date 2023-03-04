@@ -6,6 +6,7 @@ from fitnessbuddy.models import db, User
 from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
 from sqlalchemy.exc import IntegrityError
+from datetime import datetime
 
 #resource for getting all users or adding new user
 class UserCollection(Resource):
@@ -61,7 +62,15 @@ class UserItem(Resource):
         except ValidationError as e:
             raise BadRequest(description=str(e))
         
-        user.deserialize(request.json)
+        #update database entry
+        try:
+            user.name = request.json["name"]
+            user.email = request.json["email"]
+            user.age = request.json["age"]
+            user.user_creation_date = datetime.fromisoformat(request.json["user_creation_date"])
+            db.session.commit()
+        except Exception as e:
+            return Response(str(e), status=400)
         return Response(status=204, headers={"location":url_for("api.useritem", user=user)})
     
     def delete(self, user):

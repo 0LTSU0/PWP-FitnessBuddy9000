@@ -138,7 +138,7 @@ class Measurements(db.Model):
 
     def serialize(self):
         return{
-            "date": self.date,
+            "date": datetime.isoformat(self.date),
             "weight": self.weight,
             "calories_in": self.calories_in,
             "calories_out": self.calories_out,
@@ -165,6 +165,18 @@ class Measurements(db.Model):
         }
         props["user_id"] = {
             "description": "User id",
+            "type": "number"
+        }
+        props["weight"] = {
+            "description": "Weight measurement",
+            "type": "number"
+        }
+        props["calories_in"] = {
+            "description": "Calories eaten",
+            "type": "number"
+        }
+        props["calories_out"] = {
+            "description": "Calories burnt",
             "type": "number"
         }
         return schema
