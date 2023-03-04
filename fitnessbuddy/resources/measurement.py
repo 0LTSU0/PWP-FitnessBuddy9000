@@ -55,6 +55,11 @@ class MeasurementsItem(Resource):
         #check that request is json
         if not request.json:
             raise UnsupportedMediaType
+        if request.json["user_id"]:
+            if not request.json["user_id"] == user.id:
+                raise BadRequest(description="UserID mismatch in request address and body")
+        else:
+            request.json["user_id"] = user.id
         #check json schema 
         try:
             validate(request.json, Measurements.json_schema())
@@ -73,7 +78,11 @@ class MeasurementsItem(Resource):
             return Response(str(e), status=400)
         return Response(status=204, headers={"location":str(url_for("api.measurementsitem", user=measurements.user, measurements=measurements))})
     
-    def delete(self, user,  measurement):
-        db.session.delete(measurement)
-        db.session.commit()
+    def delete(self, user, measurements):
+        try:
+            db.session.delete(measurements)
+            db.session.commit()
+        except Exception as e:
+            Response(str(e), status=400)
+
         return Response(status=204)
