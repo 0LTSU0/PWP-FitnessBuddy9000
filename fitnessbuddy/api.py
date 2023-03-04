@@ -1,3 +1,6 @@
+"""
+Module for initializing fitnessbuddy api and adding resources
+"""
 from flask import Blueprint
 from flask_restful import Api
 

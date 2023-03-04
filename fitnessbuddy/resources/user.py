@@ -1,16 +1,24 @@
+"""
+Resources for User
+"""
 import json
-from flask import Response, request
-from flask import url_for
+from datetime import datetime
+from flask import Response, request, url_for
 from flask_restful import Resource
 from fitnessbuddy.models import db, User
 from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
 from sqlalchemy.exc import IntegrityError
-from datetime import datetime
 
-#resource for getting all users or adding new user
+
 class UserCollection(Resource):
+    """
+    Resource for user collections. Methods: get, post
+    """
     def get(self):
+        """
+        Method for getting all user information
+        """
         #initialize response body
         body = {
             "users": []}
@@ -21,17 +29,20 @@ class UserCollection(Resource):
 
         #return users
         return Response(json.dumps(body), 200, mimetype="application/json")
-    
+
     def post(self):
+        """
+        Method for adding new user
+        """
         #check that request is json
         if not request.json:
             raise UnsupportedMediaType
-        #check json schema 
+        #check json schema
         try:
             validate(request.json, User.json_schema())
-        except ValidationError as e:
-            raise BadRequest(description=str(e))
-        
+        except ValidationError as error:
+            raise BadRequest(description=str(error))
+
         #initialize new user using deserializer
         user = User()
         user.deserialize(request.json)
@@ -46,22 +57,30 @@ class UserCollection(Resource):
         return Response(status=201, headers={"location":str(url_for("api.useritem", user=user))})
 
 
-#resource for getting single user or modifying existing user
 class UserItem(Resource):
+    """
+    Resource for single user items. Methods: get, put, delete
+    """
     def get(self, user):
+        """
+        Method for getting user information for a specific user
+        """
         body = user.serialize()
         return Response(json.dumps(body), 200, mimetype="application/json")
-        
+
     def put(self, user):
+        """
+        Method for editing existing user information
+        """
         #check that request is json
         if not request.json:
             raise UnsupportedMediaType
-        #check json schema 
+        #check json schema
         try:
             validate(request.json, User.json_schema())
-        except ValidationError as e:
-            raise BadRequest(description=str(e))
-        
+        except ValidationError as error:
+            raise BadRequest(description=str(error))
+
         #update database entry
         try:
             user.name = request.json["name"]
@@ -69,11 +88,14 @@ class UserItem(Resource):
             user.age = request.json["age"]
             user.user_creation_date = datetime.fromisoformat(request.json["user_creation_date"])
             db.session.commit()
-        except Exception as e:
-            return Response(str(e), status=400)
+        except Exception as error:
+            return Response(str(error), status=400)
         return Response(status=204, headers={"location":url_for("api.useritem", user=user)})
-    
+
     def delete(self, user):
+        """
+        Method for deleting existing user
+        """
         db.session.delete(user)
         db.session.commit()
         return Response(status=204)

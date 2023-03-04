@@ -1,12 +1,16 @@
+"""
+Module for initializing database tables, json schemas and serializers
+"""
 from datetime import datetime
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 import click
 from flask.cli import with_appcontext
 from fitnessbuddy import db
 
-# Create database
 def create_app():
+    """
+    Function for creating test app for test.db
+    """
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -14,8 +18,10 @@ def create_app():
     app.app_context().push()
     return app, db
 
-# Create database for testing
 def create_test_app():
+    """
+    Function for creating test app for pytest.db
+    """
     app = Flask(__name__)
     app.config['TESTING'] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///pytest.db"
@@ -23,8 +29,10 @@ def create_test_app():
     app.app_context().push()
     return app, db
 
-#table for exercise information (exercise name, duration in minutes, date, user id as foreign key)
 class Exercise(db.Model):
+    """
+    Database model for exercise information (exercise name, duration in minutes, date, user id as foreign key)
+    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     duration = db.Column(db.Float, nullable=True)
@@ -35,6 +43,9 @@ class Exercise(db.Model):
     user = db.relationship("User", back_populates="exercise")
 
     def serialize(self):
+        """
+        Function for serializing exercise data item
+        """
         return{
             "name": self.name,
             "duration": self.duration,
@@ -43,6 +54,9 @@ class Exercise(db.Model):
             "id": self.id
         }
     def deserialize(self, doc):
+        """
+        Function for deserializing exercise data item
+        """
         self.name = doc["name"]
         self.duration = doc["duration"]
         self.date = datetime.fromisoformat(str(doc["date"]))
@@ -50,6 +64,9 @@ class Exercise(db.Model):
 
     @staticmethod
     def json_schema():
+        """
+        JSON schema for exercise
+        """
         schema = {
             "type": "object",
             "required": ["name", "date", "user_id"]
@@ -73,8 +90,10 @@ class Exercise(db.Model):
         }
         return schema
 
-#table for user information (name, email, age, creation date)
 class User(db.Model):
+    """
+    Database model for user information (name, email, age, creation date)
+    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(64), nullable=False)
@@ -82,10 +101,14 @@ class User(db.Model):
     user_creation_date = db.Column(db.DateTime, nullable=False)
 
     #initialize relationships
-    measurements = db.relationship("Measurements", cascade="all, delete-orphan", back_populates="user")
+    measurements = db.relationship("Measurements", cascade="all, delete-orphan",
+                                    back_populates="user")
     exercise = db.relationship("Exercise", cascade="all, delete-orphan", back_populates="user")
 
     def serialize(self):
+        """
+        Function for serializing user data item
+        """
         return{
             "name": self.name,
             "email": self.email,
@@ -94,6 +117,9 @@ class User(db.Model):
         }
 
     def deserialize(self, doc):
+        """
+        Function for deserializing user data item
+        """
         self.name = doc["name"]
         self.email = doc["email"]
         self.age = doc["age"]
@@ -101,6 +127,9 @@ class User(db.Model):
 
     @staticmethod
     def json_schema():
+        """
+        JSON schema for user
+        """
         schema = {
             "type": "object",
             "required": ["name", "email", "age", "user_creation_date"]
@@ -124,8 +153,10 @@ class User(db.Model):
         }
         return schema
 
-#table for daily measurements ( calories in/out, bodyweight, date, user id as foreign key)
 class Measurements(db.Model):
+    """
+    Database model for daily measurements ( calories in/out, bodyweight, date, user id as foreign key)
+    """
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)
     weight = db.Column(db.Float, nullable=True)
@@ -137,6 +168,9 @@ class Measurements(db.Model):
     user = db.relationship("User", back_populates="measurements")
 
     def serialize(self):
+        """
+        Function for serializing measurements data item
+        """
         return{
             "date": datetime.isoformat(self.date),
             "weight": self.weight,
@@ -147,6 +181,9 @@ class Measurements(db.Model):
         }
 
     def deserialize(self, doc):
+        """
+        Function for deserializing measurements data item
+        """
         self.date = datetime.fromisoformat(str(doc["date"]))
         self.weight = doc["weight"]
         self.calories_in = doc["calories_in"]
@@ -155,6 +192,9 @@ class Measurements(db.Model):
 
     @staticmethod
     def json_schema():
+        """
+        JSON schema for measurement
+        """
         schema = {
             "type": "object",
             "required": ["date", "user_id"]
@@ -185,4 +225,7 @@ class Measurements(db.Model):
 @click.command("init-db")
 @with_appcontext
 def init_db_command():
+    """
+    Command for creating database
+    """
     db.create_all()

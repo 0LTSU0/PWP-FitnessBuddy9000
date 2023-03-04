@@ -1,3 +1,6 @@
+"""
+Workaround method for permission error in actual testing files
+"""
 import os
 
 files = [f for f in os.listdir('.') if os.path.isfile(f)]
