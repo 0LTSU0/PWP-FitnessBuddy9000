@@ -8,34 +8,31 @@
 
 __Remember to include all required documentation and HOWTOs, including how to create and populate the database, how to run and test the API, the url to the entrypoint and instructions on how to setup and run the client__
 
-How to run the app:
+# Requirements
+Required external libraries can be found in requirements.txt
+
+# App
+Running the app:
+
 Linux
 - export FLASK_APP=fitnessbuddy
 - export FLASK_ENV=development
 - flask init-db
 - flask run
+
 Windows
 - set FLASK_APP=fitnessbuddy
 - set FLASK_ENV=development
 - flask init-db
 - flask run
 
-# Database
+# Tests
+Running tests:
 
-## Dependancies
-Database is implemented using SQLAlchemy. List of requirements for using/testing the database are in requirements.txt
+Linux
+in PWP-FitnessBuddy9000/test run python3 -m pytest
 
-pip install -r requirements.txt
+Windows
+in PWP-FitnessBuddy9000/test run run_pytest.bat
 
-## Testing database automatically
-In ..\PWP-FitnessBuddy9000\test run "python3 -m pytest"
 
-## Playing with databsae manually (and populating it with dummy data)
-In ..\PWP-FitnessBuddy9000 run the following commands:
-- "python3"
-- ">>> from database.models import *"
-- ">>> from tools.populate_database import *" 
-- ">>> app, db = create_app()"
-- ">>> db.create_all()"
-- ">>> populate_database(db, app)"
-- Run wanted commands e.g. ">>> User.query.filter_by(id=1)[0].name"
