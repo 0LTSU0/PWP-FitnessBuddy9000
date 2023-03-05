@@ -2,8 +2,8 @@
 Module for initializing database tables, json schemas and serializers
 """
 from datetime import datetime
-from flask import Flask
 import click
+from flask import Flask
 from flask.cli import with_appcontext
 from fitnessbuddy import db
 

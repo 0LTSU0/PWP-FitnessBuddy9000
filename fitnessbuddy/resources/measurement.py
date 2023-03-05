@@ -1,3 +1,7 @@
+"""
+Measurement resource implementations
+"""
+
 import json
 from datetime import datetime
 from flask import Response, request
@@ -13,6 +17,9 @@ class MeasurementsCollection(Resource):
     Class for measurements
     """
     def get(self, user):
+        """
+        Get method for MeasurementCollection
+        """
         # initialize response body
         body = {"measurements": []}
         # find all users and add them to the response
@@ -24,6 +31,9 @@ class MeasurementsCollection(Resource):
         return Response(json.dumps(body), 200, mimetype="application/json")
 
     def post(self, user):
+        """
+        Post method for MeasurementCollection
+        """
         # check that request is json
         if not request.json:
             raise UnsupportedMediaType
@@ -62,7 +72,13 @@ class MeasurementsCollection(Resource):
 
 
 class MeasurementsItem(Resource):
+    """
+    Class for MeasurementItems
+    """
     def get(self, user, measurements):
+        """
+        Get method for MeasurementItem
+        """
         if user != measurements.user:
             raise BadRequest(
                 description="requested measurement does not correspond to requested user"
@@ -71,6 +87,9 @@ class MeasurementsItem(Resource):
         return Response(json.dumps(body), 200, mimetype="application/json")
 
     def put(self, user, measurements):
+        """
+        Put method for MeasurementItem (used for updating entry)
+        """
         # check that request is json
         if not request.json:
             raise UnsupportedMediaType
@@ -111,6 +130,9 @@ class MeasurementsItem(Resource):
         )
 
     def delete(self, user, measurements):
+        """
+        Delete method for MeasurementItem
+        """
         db.session.delete(measurements)
         db.session.commit()
         return Response(status=204)

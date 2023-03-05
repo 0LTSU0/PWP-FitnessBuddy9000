@@ -41,7 +41,7 @@ class UserCollection(Resource):
         try:
             validate(request.json, User.json_schema())
         except ValidationError as error:
-            raise BadRequest(description=str(error))
+            raise BadRequest(description=str(error)) from error
 
         #initialize new user using deserializer
         user = User()
@@ -79,7 +79,7 @@ class UserItem(Resource):
         try:
             validate(request.json, User.json_schema())
         except ValidationError as error:
-            raise BadRequest(description=str(error))
+            raise BadRequest(description=str(error)) from error
 
         #update database entry
         try:

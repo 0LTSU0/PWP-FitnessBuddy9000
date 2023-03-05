@@ -1,6 +1,6 @@
 @ECHO OFF
 ECHO Starting pytest
-pytest -vv
+python3 -m pytest -vv --cov-report term-missing --cov=app
 ECHO.
 ECHO ###################################################################################
 ECHO.

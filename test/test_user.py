@@ -12,7 +12,7 @@ import tools.populate_database
 import pytest
 
 @event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection):
+def set_sqlite_pragma(dbapi_connection, connection_record):
     """
     This is important function
     """
@@ -20,8 +20,7 @@ def set_sqlite_pragma(dbapi_connection):
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
 
-# based on http://flask.pocoo.org/docs/1.0/testing/
-# we don't need a client for database testing, just the db handle
+# based on https://github.com/enkwolf/pwp-course-sensorhub-api-example
 @pytest.fixture
 def client():
     """

@@ -1,31 +1,43 @@
+"""
+Implementation for exercise resources
+"""
+
 import json
+from datetime import datetime
 from flask import Response, request
 from flask import url_for
 from flask_restful import Resource
-from fitnessbuddy.models import db, Exercise
 from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
-from datetime import datetime
+from fitnessbuddy.models import db, Exercise
 
 class ExerciseCollection(Resource):
+    """
+    Exercise resource
+    """
     def get(self, user):
+        """
+        Get method for Exercise colleciton
+        """
         body = {"exercises": []}
         for item in Exercise.query.filter_by(user=user).all():
             excr_item = item.serialize()
             body["exercises"].append(excr_item)
         return Response(json.dumps(body), 200, mimetype="application/json")
 
-
     def post(self, user):
+        """
+        Post method for Exercise colleciton
+        """
         #Validate request
         if not request.json:
             raise UnsupportedMediaType
         request.json["user_id"] = user.id
         try:
             validate(request.json, Exercise.json_schema())
-        except ValidationError as e:
-            raise BadRequest(description=str(e))
-        
+        except ValidationError as err:
+            raise BadRequest(description=str(err)) from err
+
         exrc = Exercise()
         exrc.deserialize(request.json)
         exrc.user = user
@@ -34,20 +46,31 @@ class ExerciseCollection(Resource):
         db.session.add(exrc)
         try:
             db.session.commit()
-        except Exception as e:
-            return Response(str(e), status=400)
+        except Exception as exeption:
+            return Response(str(exeption), status=400)
 
-        return Response(status=201, headers={"location":str(url_for("api.exerciseitem", user=exrc.user, exercise=exrc))})
+        return Response(status=201, headers={"location":str(url_for("api.exerciseitem",
+            user=exrc.user, exercise=exrc))})
 
 
 class ExerciseItem(Resource):
+    """
+    ExerciseItem resource
+    """
     def get(self, user, exercise):
+        """
+        Get method for ExerciseItem
+        """
         if user != exercise.user:
-            raise BadRequest(description="requested exercise does not correspond to requested user")
+            raise BadRequest(description=
+                "requested exercise does not correspond to requested user")
         body = exercise.serialize()
         return Response(json.dumps(body), 200, mimetype="application/json")
 
     def put(self, user, exercise):
+        """
+        Put method for ExerciseItem (used for modifying records)
+        """
         if not request.json:
             raise UnsupportedMediaType
         if request.json["user_id"]:
@@ -57,9 +80,9 @@ class ExerciseItem(Resource):
             request.json["user_id"] = user.id
         try:
             validate(request.json, Exercise.json_schema())
-        except ValidationError as e:
-            raise BadRequest(description=str(e))
-        
+        except ValidationError as err:
+            raise BadRequest(description=str(err)) from err
+
         #update database entry
         try:
             exercise.name = request.json["name"]
@@ -67,17 +90,20 @@ class ExerciseItem(Resource):
             exercise.user_id = request.json["user_id"]
             exercise.date = datetime.fromisoformat(request.json["date"])
             db.session.commit()
-        except Exception as e:
-            return Response(str(e), status=400)
-        
-        return Response(status=201, headers={"location":str(url_for("api.exerciseitem", user=exercise.user, exercise=exercise))})
+        except Exception as err:
+            return Response(str(err), status=400)
 
-        
+        return Response(status=201, headers={"location":str(url_for("api.exerciseitem",
+            user=exercise.user, exercise=exercise))})
+
     def delete(self, user, exercise):
+        """
+        Delete method for ExerciseItem
+        """
         try:
             db.session.delete(exercise)
             db.session.commit()
-        except Exception as e:
-            Response(str(e), status=400)
+        except Exception as err:
+            Response(str(err), status=400)
 
         return Response("Entry deleted", status=200)
