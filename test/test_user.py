@@ -101,6 +101,10 @@ def test_usercollection_post(client):
     resp = client.post(resource_url_invalid, json=invalid_user)
     assert resp.status_code == 404
 
+    #no json
+    resp = client.post(resource_url_valid, data="asd")
+    assert resp.status_code == 415
+
 def test_usercollection_get(client):
     """
     Function for testing get method on UserCollection resource
@@ -153,6 +157,11 @@ def test_useritem_put(client):
         "age": 22,
         "user_creation_date": datetime.isoformat(datetime.now()),
     }
+    invalid_json = {
+        "user_id": 1,
+        "thisis": "invalid"
+    }
+
     #Put updated user
     resp = client.put(resource_url_valid, json=updated_user)
     assert resp.status_code == 204
@@ -164,6 +173,14 @@ def test_useritem_put(client):
     #Put on not existing user
     resp = client.put(resource_url_not_exist, json=updated_user)
     assert resp.status_code == 404
+
+    #Non json
+    resp = client.put(resource_url_valid, data="asd")
+    assert resp.status_code == 415
+
+    #invalid json
+    resp = client.put(resource_url_valid, json=invalid_json)
+    assert resp.status_code == 400
 
 
 def test_useritem_del(client):

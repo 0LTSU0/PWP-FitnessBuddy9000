@@ -283,3 +283,8 @@ def test_restrictions(app):
             date=datetime.strptime(measurement_entry.get("date"), "%d/%m/%y %H:%M:%S"),
             user_id=measurement_entry.get("user_id"))
         assert insert_illegal(entry)
+
+
+def test_populate_script_error_handling(app):
+    assert False == tools.populate_database.populate_database(None, None)
+

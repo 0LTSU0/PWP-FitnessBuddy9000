@@ -35,7 +35,7 @@ class UserCollection(Resource):
         Method for adding new user
         """
         #check that request is json
-        if not request.json:
+        if not request.is_json:
             raise UnsupportedMediaType
         #check json schema
         try:
@@ -73,7 +73,7 @@ class UserItem(Resource):
         Method for editing existing user information
         """
         #check that request is json
-        if not request.json:
+        if not request.is_json:
             raise UnsupportedMediaType
         #check json schema
         try:

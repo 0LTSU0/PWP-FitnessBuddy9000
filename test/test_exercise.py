@@ -125,6 +125,10 @@ def test_ExerciseCollection_post(client):
     resp = client.post(resource_url_invalid, json=invalid_exercise)
     assert resp.status_code == 404
 
+    #Non json
+    resp = client.post(resource_url_valid, data="asd")
+    assert resp.status_code == 415
+
 
 def test_ExerciseItem_get(client):
     """
@@ -164,6 +168,15 @@ def test_ExerciseItem_put(client):
         "duration": 123321.0,
         "user_id": 1
     }
+    invalid_json = {
+        "user_id": 1,
+        "thisis": "invalid"
+    }
+    missing_userid = {
+        "date": datetime.isoformat(datetime.now()),
+        "name": "updated_laji1",
+        "duration": 123321.0
+    }
 
     #Update record
     resp = client.put(resource_url_valid, json=updated_exercise)
@@ -180,6 +193,18 @@ def test_ExerciseItem_put(client):
     #Update nonexisting record
     resp = client.put(resource_url_invalid, json=updated_exercise)
     assert resp.status_code == 404
+
+    #Non json
+    resp = client.put(resource_url_valid, data="asd")
+    assert resp.status_code == 415
+
+    #invalid json
+    resp = client.put(resource_url_valid, json=invalid_json)
+    assert resp.status_code == 400
+
+    #missing userid in json (should work since it will then be taken from url)
+    resp = client.put(resource_url_valid, json=missing_userid)
+    assert resp.status_code == 201
 
 
 def test_ExerciseItem_delete(client):

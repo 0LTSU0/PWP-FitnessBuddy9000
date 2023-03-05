@@ -30,7 +30,7 @@ class ExerciseCollection(Resource):
         Post method for Exercise colleciton
         """
         #Validate request
-        if not request.json:
+        if not request.is_json:
             raise UnsupportedMediaType
         request.json["user_id"] = user.id
         try:
@@ -71,9 +71,9 @@ class ExerciseItem(Resource):
         """
         Put method for ExerciseItem (used for modifying records)
         """
-        if not request.json:
+        if not request.is_json:
             raise UnsupportedMediaType
-        if request.json["user_id"]:
+        if request.json.get("user_id"):
             if not request.json["user_id"] == user.id:
                 raise BadRequest(description="UserID mismatch in request address and body")
         else:

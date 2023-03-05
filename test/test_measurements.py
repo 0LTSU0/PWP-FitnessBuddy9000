@@ -156,6 +156,10 @@ def test_MeasurementsCollection_post(client):
     resp = client.post(resource_url_invalid, json=invalid_measurement)
     assert resp.status_code == 404
 
+    #no json
+    resp = client.post(resource_url_valid, data="asd")
+    assert resp.status_code == 415
+
 
 def test_MeasurementsItem_get(client):
     """
@@ -196,6 +200,10 @@ def test_MeasurementsItem_put(client):
         "calories_out": 2500,
         "user_id": 3,
     }
+    invalid_json = {
+        "user_id": 1,
+        "thisis": "invalid"
+    }
 
     # Update record
     resp = client.put(resource_url_valid, json=updated_measurement)
@@ -214,6 +222,14 @@ def test_MeasurementsItem_put(client):
     # Update nonexisting record
     resp = client.put(resource_url_invalid, json=updated_measurement)
     assert resp.status_code == 404
+
+    #Non json
+    resp = client.put(resource_url_valid, data="asd")
+    assert resp.status_code == 415
+
+    #invalid json
+    resp = client.put(resource_url_valid, json=invalid_json)
+    assert resp.status_code == 400
 
 
 def test_MeasurementsItem_delete(client):

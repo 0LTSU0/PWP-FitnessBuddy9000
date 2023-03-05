@@ -35,7 +35,7 @@ class MeasurementsCollection(Resource):
         Post method for MeasurementCollection
         """
         # check that request is json
-        if not request.json:
+        if not request.is_json:
             raise UnsupportedMediaType
         # check json schema
         try:
@@ -91,7 +91,7 @@ class MeasurementsItem(Resource):
         Put method for MeasurementItem (used for updating entry)
         """
         # check that request is json
-        if not request.json:
+        if not request.is_json:
             raise UnsupportedMediaType
         if request.json["user_id"]:
             if not request.json["user_id"] == user.id:
