@@ -10,15 +10,15 @@ __Remember to include all required documentation and HOWTOs, including how to cr
 
 How to run the app:
 Linux
-export FLASK_APP=fitnessbuddy
-export FLASK_ENV=development
-flask init-db
-flask run
+- export FLASK_APP=fitnessbuddy
+- export FLASK_ENV=development
+- flask init-db
+- flask run
 Windows
-set FLASK_APP=fitnessbuddy
-set FLASK_ENV=development
-flask init-db
-flask run
+- set FLASK_APP=fitnessbuddy
+- set FLASK_ENV=development
+- flask init-db
+- flask run
 
 # Database
 
