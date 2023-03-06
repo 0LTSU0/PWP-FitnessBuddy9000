@@ -1,14 +1,22 @@
 @ECHO OFF
-set python_cmd=python3
+SET python_cmd=python3
 ECHO Select python command to use:
 ECHO 1. python
 ECHO 2. python3
-set /p input= Enter 1 or 2: 
-if %input% == 1 (
-    set python_cmd=python
-)
+SET /p input= Enter 1 or 2: 
+if %input% == 1 GOTO USE_PYTHON
+
 ECHO Executing command: %python_cmd% -m pytest -vv --cov-report term-missing --cov=app
 %python_cmd% -m pytest -vv --cov-report term-missing --cov=app
+GOTO USE_PYTHON3
+
+:USE_PYTHON
+SET python_cmd=python
+ECHO Executing command: coverage run -m pytest -vv --cov-report term-missing
+coverage run -m pytest -vv --cov-report term-missing
+coverage report
+
+:USE_PYTHON3
 ECHO.
 ECHO ###################################################################################
 ECHO.
