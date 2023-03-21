@@ -37,6 +37,7 @@ class MeasurementsCollection(Resource):
         # check that request is json
         if not request.is_json:
             raise UnsupportedMediaType
+        request.json["user_id"] = user.id
         # check json schema
         try:
             validate(request.json, Measurements.json_schema())

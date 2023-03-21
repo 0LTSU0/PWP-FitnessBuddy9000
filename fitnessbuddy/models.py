@@ -78,7 +78,7 @@ class Exercise(db.Model):
             "type": "string"
         }
         props["date"] = {
-            "description": "Datetime of the measurement as a string",
+            "description": "Datetime of the exercise as a string",
             "type": "string"
         }
         props["user_id"] = {

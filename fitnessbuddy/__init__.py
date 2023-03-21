@@ -5,6 +5,7 @@ Implementation for Fitnessbuddy9000
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flasgger import Swagger, swag_from
 
 db = SQLAlchemy()
 
@@ -19,6 +20,14 @@ def create_app(test_config=None):
         SQLALCHEMY_DATABASE_URI="sqlite:///" + os.path.join(app.instance_path, "development.db"),
         SQLALCHEMY_TRACK_MODIFICATIONS=False
     )
+
+    #add API documentation, url: /apidocs/
+    app.config["SWAGGER"] = {
+        "title": "Fitnessbuddy API",
+        "openapi": "3.0.3",
+        "uiversion": 3,
+    }
+    swagger = Swagger(app, template_file="doc/fitnessbuddy.yml")
 
     if test_config is None:
         app.config.from_pyfile("config.py", silent=True)

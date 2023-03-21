@@ -1,0 +1,420 @@
+---
+openapi: 3.0.3
+servers:
+- url: /api
+components:
+  parameters:
+    user:
+      description: Selected user's unique ID
+      in: path
+      name: user
+      required: true
+      schema:
+        type: number
+    exercise:
+      description: Selected exercise's unique ID
+      in: path
+      name: exercise
+      required: true
+      schema:
+        type: number
+    measurements:
+      description: Selected measurement's unique ID
+      in: path
+      name: measurements
+      required: true
+      schema:
+        type: number
+  schemas:
+    User:
+      properties:
+        name:
+          description: User's name
+          type: string
+        email:
+          description: User's email
+          type: string
+        age:
+          description: User's age
+          type: number
+        user_creation_date:
+          description: User's creation datetime as a string
+          type: string
+      required:
+      - name
+      - email
+      - age
+      - user_creation_date
+      type: object
+    Exercise:
+      properties:
+        name:
+          description: Name of the exercise
+          type: string
+        date:
+          description: Datetime of the exercise as a string
+          type: string
+        user_id:
+          description: User id
+          type: number
+        duration:
+          description: Duration of exercise
+          type: number
+      required:
+      - name
+      - date
+      - user_id
+      type: object
+    Measurements:
+      properties:
+        date:
+          description: Datetime of the measurement as a string
+          type: string
+        user_id:
+          description: User id
+          type: number
+        weight:
+          description: Weight measurement
+          type: number
+        calories_in:
+          description: Calories eaten
+          type: number
+        calories_out:
+          description: Calories burnt
+          type: number
+      required:
+      - date
+      - user_id
+      type: object
+info:
+  title: FitnessBuddy9000
+  version: 0.0.1
+  description: |
+    API documentation for FitnessBuddy9000. It is used to store all kinds of fitness related data about users.
+    E.g. exercises done and daily measurements. Purpose is to help users to keep track of their progression in sports.
+  termsOfService: http://nothing/
+  contact:
+    url: http://nothing/
+    email: nothing@nothing.com
+    name: FAKE CONTACT
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+paths:
+  /users/:
+    get:
+      description: Get the list of existing users
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              example:
+              - name: user-1
+                email: user-1@email.com
+                age: 22
+                user_creation_date: "2023-02-11T13:01:56"
+              - name: user-2
+                email: user-2@email.com
+                age: 44
+                user_creation_date: "2023-02-11T13:01:56"
+    post:
+      description: Create a new user
+      requestBody:
+        description: JSON document that contains basic data for a new user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+            example:
+              name: user-1
+              email: user-1@email.com
+              age: 22
+              user_creation_date: "2023-02-11T13:01:56"
+      responses:
+        '201':
+          description: Successfully created a new user
+          headers:
+            Location: 
+              description: URI of the new user
+              schema: 
+                type: string
+        '400':
+          description: Invalid request body
+        '415':
+          description: Request body isn't JSON
+  /users/{user}/:
+    parameters:
+        - in: path
+          name: user
+          schema:
+            type: integer
+          required: true
+          description: User id
+    get:
+      description: Get information for a single user
+      responses:
+        '200':
+          description: User information
+          content:
+            application/json:
+              example:
+              - name: user-1
+                email: user-1@email.com
+                age: 22
+                user_creation_date: "2023-02-11T13:01:56"
+    put:
+      description: Edit existing user
+      requestBody:
+        description: JSON document that contains modified user information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+            example:
+              name: user-3
+              email: user-3@email.com
+              age: 33
+              user_creation_date: "2023-02-11T13:01:56"
+      responses:
+        '204':
+          description: Successfully edited user
+          headers:
+            Location: 
+              description: URI of the edited user
+              schema: 
+                type: string
+        '400':
+          description: Invalid request body
+        '415':
+          description: Request body isn't JSON
+    delete:
+      description: Delete existing user
+      responses:
+        '204':
+          description: Successfully deleted user
+  /users/{user}/exercises/:
+    parameters:
+        - in: path
+          name: user
+          schema:
+            type: integer
+          required: true
+          description: User id
+    get:
+      description: Get the list of exercises for this user
+      responses:
+        '200':
+          description: List of exercises
+          content:
+            application/json:
+              example:
+              - name: Basketball
+                duration: 2656.0
+                date: "2023-02-11T13:01:56"
+                user_id: 1
+                id: 1
+              - name: Football
+                duration: 2656.0
+                date: "2023-02-11T13:01:56"
+                user_id: 1
+                id: 2
+    post:
+      description: Create a new exercise
+      requestBody:
+        description: JSON document that contains information about the exercise
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+            example:
+              name: Basketball
+              duration: 2656.0
+              date: "2023-02-11T13:01:56"
+      responses:
+        '201':
+          description: Successfully created a new exercise
+          headers:
+            Location: 
+              description: URI of the new exercise
+              schema: 
+                type: string
+        '400':
+          description: Invalid request body
+        '415':
+          description: Request body isn't JSON
+  /users/{user}/exercises/{exercise}/:
+    parameters:
+        - in: path
+          name: user
+          schema:
+            type: integer
+          required: true
+          description: User id
+        - in: path
+          name: exercise
+          schema:
+            type: integer
+          required: true
+          description: Exercise id
+    get:
+      description: Get information for a single exercise
+      responses:
+        '200':
+          description: Exercise information
+          content:
+            application/json:
+              example:
+              - name: Basketball
+                duration: 2656.0
+                date: "2023-02-11T13:01:56"
+                user_id: 1
+                id: 1
+        '400':
+          description: User id doesn't match the exercise's user id
+    put:
+      description: Edit existing exercise
+      requestBody:
+        description: JSON document that contains modified exercise information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Exercise'
+            example:
+              name: Football
+              duration: 2656.0
+              date: "2023-02-11T13:01:56"
+              user_id: 1
+              id: 1
+      responses:
+        '201':
+          description: Successfully edited exercise
+          headers:
+            Location: 
+              description: URI of the edited user
+              schema: 
+                type: string
+        '400':
+          description: Invalid request body
+        '415':
+          description: Request body isn't JSON
+    delete:
+      description: Delete existing exercise
+      responses:
+        '200':
+          description: Successfully deleted exercise
+  /users/{user}/measurements/:
+    parameters:
+        - in: path
+          name: user
+          schema:
+            type: integer
+          required: true
+          description: User id
+    get:
+      description: Get the list of measurements for this user
+      responses:
+        '200':
+          description: List of measurements
+          content:
+            application/json:
+              example:
+              - date: "2023-02-11T13:01:56"
+                weight: 66.0
+                calories_in: 2659.0
+                calories_out: 2664.0
+                user_id: 1
+                id: 1
+              - date: "2023-02-11T13:01:56"
+                weight: 66.5
+                calories_in: 2600.0
+                calories_out: 2555.0
+                user_id: 1
+                id: 2
+    post:
+      description: Create a new measurements item
+      requestBody:
+        description: JSON document that contains information about the measuremnts
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Measurements'
+            example:
+              date: "2023-02-11T13:01:56"
+              weight: 66.0
+              calories_in: 2659.0
+              calories_out: 2664.0
+      responses:
+        '201':
+          description: Successfully created a new measurements item
+          headers:
+            Location: 
+              description: URI of the new measurements item
+              schema: 
+                type: string
+        '400':
+          description: Invalid request body
+        '415':
+          description: Request body isn't JSON
+  /users/{user}/measurements/{measurements}/:
+    parameters:
+        - in: path
+          name: user
+          schema:
+            type: integer
+          required: true
+          description: User id
+        - in: path
+          name: measurements
+          schema:
+            type: integer
+          required: true
+          description: Measurements item id
+    get:
+      description: Get information for a single measurements
+      responses:
+        '200':
+          description: Measurements information
+          content:
+            application/json:
+              example:
+              - date: "2023-02-11T13:01:56"
+                weight: 66.0
+                calories_in: 2659.0
+                calories_out: 2664.0
+                user_id: 1
+                id: 1
+        '400':
+          description: User id doesn't match the measurements's user id
+    put:
+      description: Edit existing measurements
+      requestBody:
+        description: JSON document that contains modified measurements information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Measurements'
+            example:
+              date: "2023-02-11T13:01:56"
+              weight: 56.0
+              calories_in: 3000.0
+              calories_out: 3000.0
+              user_id: 1
+              id: 1
+      responses:
+        '204':
+          description: Successfully edited measurements
+          headers:
+            Location: 
+              description: URI of the edited measurements
+              schema: 
+                type: string
+        '400':
+          description: Invalid request body
+        '415':
+          description: Request body isn't JSON
+    delete:
+      description: Delete existing measurements
+      responses:
+        '200':
+          description: Successfully deleted measurements
