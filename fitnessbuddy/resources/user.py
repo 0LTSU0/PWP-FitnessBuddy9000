@@ -9,7 +9,9 @@ from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
 from sqlalchemy.exc import IntegrityError
 from fitnessbuddy.models import db, User
+from fitnessbuddy.utils import MasonBuilder
 
+MASON = "application/vnd.mason+json"
 
 class UserCollection(Resource):
     """
@@ -20,15 +22,19 @@ class UserCollection(Resource):
         Method for getting all user information
         """
         #initialize response body
-        body = {
-            "users": []}
+        body = []
+        res = MasonBuilder()
         #find all users and add them to the response
         for item in User.query.all():
             user_item = item.serialize()
-            body["users"].append(user_item)
+            body.append(user_item)
+
+        res["users"] = body
+        res.add_control("self", "/api/users/")
+        res.add_control_post("add_user", "post", "/api/users/", User.json_schema())
 
         #return users
-        return Response(json.dumps(body), 200, mimetype="application/json")
+        return Response(json.dumps(res), 200, mimetype=MASON)
 
     def post(self):
         """
@@ -53,8 +59,13 @@ class UserCollection(Resource):
             db.session.commit()
         except IntegrityError:
             return Response(status=400)
+        
+        res = MasonBuilder()
+        res.add_control("self", url_for("api.useritem", user=user))
+        res.add_control_delete("delete", url_for("api.useritem", user=user))
+        res.add_control_put("edit", url_for("api.useritem", user=user), User.json_schema())
 
-        return Response(status=201, headers={"location":str(url_for("api.useritem", user=user))})
+        return Response(json.dumps(res), 200, mimetype=MASON)
 
 
 class UserItem(Resource):
@@ -65,8 +76,15 @@ class UserItem(Resource):
         """
         Method for getting user information for a specific user
         """
-        body = user.serialize()
-        return Response(json.dumps(body), 200, mimetype="application/json")
+        res = MasonBuilder()
+        res["user"] = user.serialize()
+        res.add_control("self", url_for("api.useritem", user=user))
+        res.add_control("exercises", url_for("api.exercisecollection", user=user))
+        res.add_control("measurements", url_for("api.measurementscollection", user=user))
+        res.add_control_delete("delete", url_for("api.useritem", user=user))
+        res.add_control_put("edit", url_for("api.useritem", user=user), User.json_schema())
+        
+        return Response(json.dumps(res), 200, mimetype=MASON)
 
     def put(self, user):
         """
@@ -90,6 +108,8 @@ class UserItem(Resource):
             db.session.commit()
         except Exception as error:
             return Response(str(error), status=400)
+        
+        #204 has no response body
         return Response(status=204, headers={"location":url_for("api.useritem", user=user)})
 
     def delete(self, user):
@@ -98,4 +118,5 @@ class UserItem(Resource):
         """
         db.session.delete(user)
         db.session.commit()
+        #204 has no response body
         return Response(status=204)

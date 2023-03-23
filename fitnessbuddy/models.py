@@ -1,6 +1,8 @@
 """
 Module for initializing database tables, json schemas and serializers
 """
+import os
+import json
 from datetime import datetime
 import click
 from flask import Flask
@@ -231,3 +233,31 @@ def init_db_command():
     Command for creating database
     """
     db.create_all()
+
+@click.command("fill-db")
+@with_appcontext
+def fill_db_command():
+    """
+    Command for putting dummy data to database
+    """
+    with open(os.path.join(os.path.dirname(__file__), "..", "tools", "dummy_data.json"), "r",
+        encoding="utf-8") as file:
+        dummy_data = json.load(file)
+        for user in dummy_data.get("Users"):
+            entry = User(name=user.get("name"), email=user.get("email"), age=user.get("age"),
+                        user_creation_date=datetime.strptime(user.get("date"),
+                        "%d/%m/%y %H:%M:%S"))
+            db.session.add(entry)
+        db.session.commit()
+        for exercise in dummy_data.get("Exercise_record"):
+            entry = Exercise(name=exercise.get("name"), duration=exercise.get("duration"),
+                date=datetime.strptime(exercise.get("date"), "%d/%m/%y %H:%M:%S"),
+                user_id=exercise.get("user_id"))
+            db.session.add(entry)
+        db.session.commit()
+        for meas in dummy_data.get("Measurements"):
+            entry = Measurements(weight=meas.get("weight"), calories_in=meas.get("calories_in"),
+                calories_out=meas.get("calories_out"), date=datetime.strptime(
+                meas.get("date"),"%d/%m/%y %H:%M:%S"), user_id=meas.get("user_id"))
+            db.session.add(entry)
+        db.session.commit()

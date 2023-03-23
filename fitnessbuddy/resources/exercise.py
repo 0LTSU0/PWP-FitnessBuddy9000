@@ -10,6 +10,9 @@ from flask_restful import Resource
 from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
 from fitnessbuddy.models import db, Exercise
+from fitnessbuddy.utils import MasonBuilder
+
+MASON = "application/vnd.mason+json"
 
 class ExerciseCollection(Resource):
     """
@@ -19,11 +22,17 @@ class ExerciseCollection(Resource):
         """
         Get method for Exercise colleciton
         """
-        body = {"exercises": []}
+        body = []
         for item in Exercise.query.filter_by(user=user).all():
             excr_item = item.serialize()
-            body["exercises"].append(excr_item)
-        return Response(json.dumps(body), 200, mimetype="application/json")
+            body.append(excr_item)
+
+        res = MasonBuilder()
+        res["exercises"] = body
+        res.add_control("self", url_for("api.exercisecollection", user=user))
+        res.add_control_post("add_exercise", "post", url_for("api.exercisecollection", user=user), Exercise.json_schema())
+
+        return Response(json.dumps(res), 200, mimetype=MASON)
 
     def post(self, user):
         """
@@ -48,9 +57,13 @@ class ExerciseCollection(Resource):
             db.session.commit()
         except Exception as exeption:
             return Response(str(exeption), status=400)
+        
+        res = MasonBuilder()
+        res.add_control("self", url_for("api.exerciseitem", user=exrc.user, exercise=exrc))
+        res.add_control_delete("delete", url_for("api.exerciseitem", user=exrc.user, exercise=exrc))
+        res.add_control_put("edit", url_for("api.exerciseitem", user=exrc.user, exercise=exrc), Exercise.json_schema())
 
-        return Response(status=201, headers={"location":str(url_for("api.exerciseitem",
-            user=exrc.user, exercise=exrc))})
+        return Response(json.dumps(res), 201, mimetype=MASON)
 
 
 class ExerciseItem(Resource):
@@ -64,8 +77,11 @@ class ExerciseItem(Resource):
         if user != exercise.user:
             raise BadRequest(description=
                 "requested exercise does not correspond to requested user")
-        body = exercise.serialize()
-        return Response(json.dumps(body), 200, mimetype="application/json")
+        
+        res = MasonBuilder()
+        res["exercise"] = exercise.serialize()
+        res.add_control("self", url_for("api.exerciseitem", user=user, exercise=exercise))
+        return Response(json.dumps(res), 200, mimetype=MASON)
 
     def put(self, user, exercise):
         """
@@ -93,7 +109,8 @@ class ExerciseItem(Resource):
         except Exception as err:
             return Response(str(err), status=400)
 
-        return Response(status=201, headers={"location":str(url_for("api.exerciseitem",
+        #204 has no response body
+        return Response(status=204, headers={"location":str(url_for("api.exerciseitem",
             user=exercise.user, exercise=exercise))})
 
     def delete(self, user, exercise):
@@ -106,4 +123,4 @@ class ExerciseItem(Resource):
         except Exception as err:
             Response(str(err), status=400)
 
-        return Response("Entry deleted", status=200)
+        return Response("Entry deleted", status=204)

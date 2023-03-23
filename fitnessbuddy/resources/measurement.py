@@ -8,9 +8,12 @@ from flask import Response, request
 from flask import url_for
 from flask_restful import Resource
 from fitnessbuddy.models import db, Measurements
+from fitnessbuddy.utils import MasonBuilder
 from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
 from sqlalchemy.exc import IntegrityError
+
+MASON = "application/vnd.mason+json"
 
 class MeasurementsCollection(Resource):
     """
@@ -21,14 +24,19 @@ class MeasurementsCollection(Resource):
         Get method for MeasurementCollection
         """
         # initialize response body
-        body = {"measurements": []}
+        body = []
         # find all users and add them to the response
         for item in Measurements.query.filter_by(user=user).all():
             measurement_item = item.serialize()
-            body["measurements"].append(measurement_item)
+            body.append(measurement_item)
+
+        res = MasonBuilder()
+        res["measurements"] = body
+        res.add_control("self", url_for("api.measurementscollection", user=user))
+        res.add_control_post("add_measurement", "post", url_for("api.measurementscollection", user=user), Measurements.json_schema())
 
         # return users
-        return Response(json.dumps(body), 200, mimetype="application/json")
+        return Response(json.dumps(res), 200, mimetype=MASON)
 
     def post(self, user):
         """
@@ -58,18 +66,12 @@ class MeasurementsCollection(Resource):
         except (KeyError, ValueError, IntegrityError):
             return Response(str(error), status=400)
 
-        return Response(
-            status=201,
-            headers={
-                "location": str(
-                    url_for(
-                        "api.measurementsitem",
-                        user=measurement.user,
-                        measurements=measurement,
-                    )
-                )
-            },
-        )
+        res = MasonBuilder()
+        res.add_control("self", url_for("api.measurementsitem", user=measurement.user, measurements=measurement))
+        res.add_control_delete("delete", url_for("api.measurementsitem", user=measurement.user, measurements=measurement))
+        res.add_control_put("edit", url_for("api.measurementsitem", user=measurement.user, measurements=measurement), Measurements.json_schema())
+
+        return Response(json.dumps(res), 201, mimetype=MASON)
 
 
 class MeasurementsItem(Resource):
@@ -84,8 +86,11 @@ class MeasurementsItem(Resource):
             raise BadRequest(
                 description="requested measurement does not correspond to requested user"
             )
-        body = measurements.serialize()
-        return Response(json.dumps(body), 200, mimetype="application/json")
+        
+        res = MasonBuilder()
+        res["exercise"] = measurements.serialize()
+        res.add_control("self", url_for("api.measurementsitem", user=measurements.user, measurements=measurements))
+        return Response(json.dumps(res), 200, mimetype=MASON)
 
     def put(self, user, measurements):
         """

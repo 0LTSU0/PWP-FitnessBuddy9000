@@ -48,6 +48,7 @@ def create_app(test_config=None):
     app.url_map.converters["exercise"] = ExerciseConverter
     app.url_map.converters["measurements"] = MeasurementsConverter
     app.cli.add_command(models.init_db_command)
+    app.cli.add_command(models.fill_db_command)
     app.register_blueprint(api.api_bp)
 
     return app
