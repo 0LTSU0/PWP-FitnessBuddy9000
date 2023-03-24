@@ -142,11 +142,41 @@ paths:
       responses:
         '201':
           description: Successfully created a new user
-          headers:
-            Location: 
-              description: URI of the new user
-              schema: 
-                type: string
+          content:
+            json:
+              example:
+                controls:
+                  self:
+                    href: /api/users/1/
+                  delete:
+                    method": DELETE
+                    title: delete
+                    href: /api/users/1/
+                  edit:
+                    href: /api/users/1/
+                    method: PUT
+                    encoding: json
+                    title: edit
+                    schema:
+                      type: object
+                      required:
+                        name:
+                        email:
+                        age:
+                        user_creation_date:
+                      properties:
+                        name:
+                          description: User's name
+                          type: string
+                        email:
+                          description: User's email
+                          type: string
+                        age:
+                          description: User's age
+                          type: number
+                        user_creation_date:
+                          description: User's creation datetime as a string
+                          type: string
         '400':
           description: Invalid request body
           content:
@@ -302,11 +332,40 @@ paths:
       responses:
         '201':
           description: Successfully created a new exercise
-          headers:
-            Location: 
-              description: URI of the new exercise
-              schema: 
-                type: string
+          content:
+            json:
+              example:
+                controls:
+                  self:
+                    href: /api/users/1/exercises/1/
+                  delete:
+                    method": DELETE
+                    title: delete
+                    href: /api/users/1/exercises/1/
+                  edit:
+                    href: /api/users/1/exercises/1/
+                    method: PUT
+                    encoding: json
+                    title: edit
+                    schema:
+                      type: object
+                      required:
+                        name:
+                        date:
+                        user_id:
+                      properties:
+                        name:
+                          description: Name of the exercise
+                          type: string
+                        date:
+                          description: Datetime of the measurement as a string
+                          type: string
+                        user_id:
+                          description: User id
+                          type: number
+                        duration:
+                          description: Duration of exercise
+                          type: number
         '400':
           description: Invalid request body
           content:
@@ -479,11 +538,42 @@ paths:
       responses:
         '201':
           description: Successfully created a new measurements item
-          headers:
-            Location: 
-              description: URI of the new measurements item
-              schema: 
-                type: string
+          content:
+            json:
+              example:
+                controls:
+                  self:
+                    href: /api/users/1/measurements/1/
+                  delete:
+                    method": DELETE
+                    title: delete
+                    href: /api/users/1/measurements/1/
+                  edit:
+                    href: /api/users/1/measurements/1/
+                    method: PUT
+                    encoding: json
+                    title: edit
+                    schema:
+                      type: object
+                      required:
+                        date:
+                        user_id:
+                      properties:
+                        date:
+                          description: Datetime of the measurement as a string
+                          type: string
+                        user_id:
+                          description: User id
+                          type: number
+                        weight:
+                          description: Weight measurement
+                          type: number
+                        calories_in:
+                          description: Calories eaten
+                          type: number
+                        calories_out:
+                          description: Calories burnt
+                          type: number
         '400':
           description: Invalid request body
           content:
