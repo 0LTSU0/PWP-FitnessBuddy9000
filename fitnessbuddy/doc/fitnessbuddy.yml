@@ -142,8 +142,15 @@ paths:
       responses:
         '201':
           description: Successfully created a new user
+          links:
+            GetUserByUserId:
+              operationId: Access user
+              parameters:
+                user: 'User ID'
+              description: >
+                New user ID can be used to access the the new user. GET, PUT, and DELETE methods can be used for /api/users/{user}/
           content:
-            json:
+            application/vnd.mason+json:
               example:
                 controls:
                   self:
@@ -332,8 +339,16 @@ paths:
       responses:
         '201':
           description: Successfully created a new exercise
+          links:
+            GetUserByUserId:
+              operationId: Access exercise
+              parameters:
+                user: 'User ID'
+                exercise: 'Exercise ID'
+              description: >
+                New exercise ID can be used to access the the new item. GET, PUT, and DELETE methods can be used for /api/users/{user}/exercises/{exercise}/
           content:
-            json:
+            application/vnd.mason+json:
               example:
                 controls:
                   self:
@@ -538,8 +553,16 @@ paths:
       responses:
         '201':
           description: Successfully created a new measurements item
+          links:
+            GetUserByUserId:
+              operationId: Get measurements
+              parameters:
+                user: 'User ID'
+                measurements: 'Measurements ID'
+              description: >
+                New measurement ID can be used to access the the new item. GET, PUT, and DELETE methods can be used for /api/users/{user}/measurements/{measurements}/
           content:
-            json:
+            application/vnd.mason+json:
               example:
                 controls:
                   self:
