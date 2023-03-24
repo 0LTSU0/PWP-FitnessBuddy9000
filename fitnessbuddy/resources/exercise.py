@@ -76,7 +76,7 @@ class ExerciseItem(Resource):
         """
         if user != exercise.user:
             raise BadRequest(description=
-                "requested exercise does not correspond to requested user")
+                "Requested exercise does not correspond to requested user")
         
         res = MasonBuilder()
         res["exercise"] = exercise.serialize()

@@ -106,7 +106,7 @@ paths:
       description: Get the list of existing users
       responses:
         '200':
-          description: List of users
+          description: Successfully retrieved list of users
           content:
             application/json:
               example:
@@ -118,6 +118,14 @@ paths:
                 email: user-2@email.com
                 age: 44
                 user_creation_date: "2023-02-11T13:01:56"
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     post:
       description: Create a new user
       requestBody:
@@ -139,10 +147,30 @@ paths:
               description: URI of the new user
               schema: 
                 type: string
+          content:
+            html:
+              example:
+                Returns empty response body and headers with a location of the new item. E.g. /api/users/1/
         '400':
           description: Invalid request body
+          content:
+            json:
+              example:
+                message: The browser (or proxy) sent a request that this server could not understand.
         '415':
           description: Request body isn't JSON
+          content:
+            json:
+              example:
+                message: The server does not support the media type transmitted in the request.
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
   /users/{user}/:
     parameters:
         - in: path
@@ -155,7 +183,7 @@ paths:
       description: Get information for a single user
       responses:
         '200':
-          description: User information
+          description: Successfully retrieved user information
           content:
             application/json:
               example:
@@ -163,6 +191,14 @@ paths:
                 email: user-1@email.com
                 age: 22
                 user_creation_date: "2023-02-11T13:01:56"
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     put:
       description: Edit existing user
       requestBody:
@@ -184,15 +220,43 @@ paths:
               description: URI of the edited user
               schema: 
                 type: string
+          content:
+            html:
+              example:
+                Returns empty response body and headers with a location of the edited item. E.g. /api/users/1/
         '400':
           description: Invalid request body
+          content:
+            json:
+              example:
+                message: The browser (or proxy) sent a request that this server could not understand.
         '415':
           description: Request body isn't JSON
+          content:
+            json:
+              example:
+                message: The server does not support the media type transmitted in the request.
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     delete:
       description: Delete existing user
       responses:
         '204':
           description: Successfully deleted user
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
   /users/{user}/exercises/:
     parameters:
         - in: path
@@ -205,7 +269,7 @@ paths:
       description: Get the list of exercises for this user
       responses:
         '200':
-          description: List of exercises
+          description: Succesfully retrieved list of exercises
           content:
             application/json:
               example:
@@ -219,6 +283,14 @@ paths:
                 date: "2023-02-11T13:01:56"
                 user_id: 1
                 id: 2
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     post:
       description: Create a new exercise
       requestBody:
@@ -239,10 +311,30 @@ paths:
               description: URI of the new exercise
               schema: 
                 type: string
+          content:
+            html:
+              example:
+                Returns empty response body and headers with a location of the new item. E.g. /api/users/1/exercises/1/
         '400':
           description: Invalid request body
+          content:
+            json:
+              example:
+                message: The browser (or proxy) sent a request that this server could not understand.
         '415':
           description: Request body isn't JSON
+          content:
+            json:
+              example:
+                message: The server does not support the media type transmitted in the request.
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
   /users/{user}/exercises/{exercise}/:
     parameters:
         - in: path
@@ -261,7 +353,7 @@ paths:
       description: Get information for a single exercise
       responses:
         '200':
-          description: Exercise information
+          description: Successfully retrieved exercise information
           content:
             application/json:
               example:
@@ -272,6 +364,18 @@ paths:
                 id: 1
         '400':
           description: User id doesn't match the exercise's user id
+          content:
+            json:
+              example:
+                message: Requested exercise does not correspond to requested user.
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     put:
       description: Edit existing exercise
       requestBody:
@@ -294,15 +398,43 @@ paths:
               description: URI of the edited user
               schema: 
                 type: string
+          content:
+            html:
+              example:
+                Returns empty response body and headers with a location of the edited item. E.g. /api/users/1/exercises/1/
         '400':
           description: Invalid request body
+          content:
+            json:
+              example:
+                message: The browser (or proxy) sent a request that this server could not understand.
         '415':
           description: Request body isn't JSON
+          content:
+            json:
+              example:
+                message: The server does not support the media type transmitted in the request.
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     delete:
       description: Delete existing exercise
       responses:
         '200':
           description: Successfully deleted exercise
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
   /users/{user}/measurements/:
     parameters:
         - in: path
@@ -315,7 +447,7 @@ paths:
       description: Get the list of measurements for this user
       responses:
         '200':
-          description: List of measurements
+          description: Succesfully retrieved list of measurements
           content:
             application/json:
               example:
@@ -331,6 +463,14 @@ paths:
                 calories_out: 2555.0
                 user_id: 1
                 id: 2
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     post:
       description: Create a new measurements item
       requestBody:
@@ -352,10 +492,30 @@ paths:
               description: URI of the new measurements item
               schema: 
                 type: string
+          content:
+            html:
+              example:
+                Returns empty response body and headers with a location of the new item. E.g. /api/users/1/measurements/1/
         '400':
           description: Invalid request body
+          content:
+            json:
+              example:
+                message: The browser (or proxy) sent a request that this server could not understand.
         '415':
           description: Request body isn't JSON
+          content:
+            json:
+              example:
+                message: The server does not support the media type transmitted in the request.
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
   /users/{user}/measurements/{measurements}/:
     parameters:
         - in: path
@@ -374,7 +534,7 @@ paths:
       description: Get information for a single measurements
       responses:
         '200':
-          description: Measurements information
+          description: Successfully retrieved measurements information
           content:
             application/json:
               example:
@@ -386,6 +546,18 @@ paths:
                 id: 1
         '400':
           description: User id doesn't match the measurements's user id
+          content:
+            json:
+              example:
+                message: Requested measurement does not correspond to requested user.
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     put:
       description: Edit existing measurements
       requestBody:
@@ -409,12 +581,40 @@ paths:
               description: URI of the edited measurements
               schema: 
                 type: string
+          content:
+            html:
+              example:
+                Returns empty response body and headers with a location of the edited item. E.g. /api/users/1/measurements/1/
         '400':
           description: Invalid request body
+          content:
+            json:
+              example:
+                message: The browser (or proxy) sent a request that this server could not understand.
         '415':
           description: Request body isn't JSON
+          content:
+            json:
+              example:
+                message: The server does not support the media type transmitted in the request.
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     delete:
       description: Delete existing measurements
       responses:
         '200':
           description: Successfully deleted measurements
+        '404':
+          description: Not found
+          content:
+            html:
+              example:
+                <title>404 Not Found</title>
+                <h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>

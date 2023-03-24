@@ -84,7 +84,7 @@ class MeasurementsItem(Resource):
         """
         if user != measurements.user:
             raise BadRequest(
-                description="requested measurement does not correspond to requested user"
+                description="Requested measurement does not correspond to requested user"
             )
         
         res = MasonBuilder()
