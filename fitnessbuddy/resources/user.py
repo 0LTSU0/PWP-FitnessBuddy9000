@@ -31,7 +31,7 @@ class UserCollection(Resource):
 
         res["users"] = body
         res.add_control("self", "/api/users/")
-        res.add_control_post("add_user", "post", "/api/users/", User.json_schema())
+        res.add_control_post("add_user", "fitnessbuddy:adduser", "/api/users/", User.json_schema())
 
         #return users
         return Response(json.dumps(res), 200, mimetype=MASON)

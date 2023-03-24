@@ -33,7 +33,7 @@ class MeasurementsCollection(Resource):
         res = MasonBuilder()
         res["measurements"] = body
         res.add_control("self", url_for("api.measurementscollection", user=user))
-        res.add_control_post("add_measurement", "post", url_for("api.measurementscollection", user=user), Measurements.json_schema())
+        res.add_control_post("add_measurement", "fitnessbuddy:addmeasurement", url_for("api.measurementscollection", user=user), Measurements.json_schema())
 
         # return users
         return Response(json.dumps(res), 200, mimetype=MASON)

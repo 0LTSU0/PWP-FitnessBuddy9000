@@ -123,7 +123,7 @@ class MasonBuilder(dict):
         """
         
         self.add_control(
-            "delete",
+            "fitnessbuddy:delete",
             href,
             method="DELETE",
             title=title,
