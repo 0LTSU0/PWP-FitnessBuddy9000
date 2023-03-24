@@ -30,7 +30,7 @@ class ExerciseCollection(Resource):
         res = MasonBuilder()
         res["exercises"] = body
         res.add_control("self", url_for("api.exercisecollection", user=user))
-        res.add_control_post("add_exercise", "fitnessbuddy:addexercise", url_for("api.exercisecollection", user=user), Exercise.json_schema())
+        res.add_control_post("fitnessbuddy:add_exercise", "fitnessbuddy:add-exercise", url_for("api.exercisecollection", user=user), Exercise.json_schema())
 
         return Response(json.dumps(res), 200, mimetype=MASON)
 
@@ -60,8 +60,8 @@ class ExerciseCollection(Resource):
         
         res = MasonBuilder()
         res.add_control("self", url_for("api.exerciseitem", user=exrc.user, exercise=exrc))
-        res.add_control_delete("delete", url_for("api.exerciseitem", user=exrc.user, exercise=exrc))
-        res.add_control_put("edit", url_for("api.exerciseitem", user=exrc.user, exercise=exrc), Exercise.json_schema())
+        res.add_control_delete("Delete exercise", url_for("api.exerciseitem", user=exrc.user, exercise=exrc))
+        res.add_control_put("Edit exercise", url_for("api.exerciseitem", user=exrc.user, exercise=exrc), Exercise.json_schema())
 
         return Response(json.dumps(res), 201, mimetype=MASON)
 

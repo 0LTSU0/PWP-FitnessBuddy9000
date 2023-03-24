@@ -141,7 +141,7 @@ def test_ExerciseItem_get(client):
     #Get exercise record corresponding to user
     resp = client.get(resource_url_valid)
     assert resp.status_code == 200
-    res = json.loads(resp.data)
+    res = json.loads(resp.data)["exercise"]
     del res["id"]
     excepted = get_dummy_data_by_userid(1)
     assert res == excepted[0]
@@ -180,9 +180,9 @@ def test_ExerciseItem_put(client):
 
     #Update record
     resp = client.put(resource_url_valid, json=updated_exercise)
-    assert resp.status_code == 201
+    assert resp.status_code == 204
     resp = client.get(resource_url_valid)
-    res = json.loads(resp.data)
+    res = json.loads(resp.data)["exercise"]
     del res["id"]
     assert res == updated_exercise
 
@@ -204,7 +204,7 @@ def test_ExerciseItem_put(client):
 
     #missing userid in json (should work since it will then be taken from url)
     resp = client.put(resource_url_valid, json=missing_userid)
-    assert resp.status_code == 201
+    assert resp.status_code == 204
 
 
 def test_ExerciseItem_delete(client):
@@ -217,7 +217,7 @@ def test_ExerciseItem_delete(client):
 
     #Delete existing record (and verify deletion)
     resp = client.delete(resource_url_valid)
-    assert resp.status_code == 200
+    assert resp.status_code == 204
     resp = client.get(resource_url_valid)
     assert resp.status_code == 404
 

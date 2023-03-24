@@ -31,7 +31,7 @@ class UserCollection(Resource):
 
         res["users"] = body
         res.add_control("self", "/api/users/")
-        res.add_control_post("add_user", "fitnessbuddy:adduser", "/api/users/", User.json_schema())
+        res.add_control_post("fitnessbuddy:add-user", "Add user", "/api/users/", User.json_schema())
 
         #return users
         return Response(json.dumps(res), 200, mimetype=MASON)
@@ -62,8 +62,8 @@ class UserCollection(Resource):
         
         res = MasonBuilder()
         res.add_control("self", url_for("api.useritem", user=user))
-        res.add_control_delete("delete", url_for("api.useritem", user=user))
-        res.add_control_put("edit", url_for("api.useritem", user=user), User.json_schema())
+        res.add_control_delete("Delete user", url_for("api.useritem", user=user))
+        res.add_control_put("Edit user", url_for("api.useritem", user=user), User.json_schema())
 
         return Response(json.dumps(res), 201, mimetype=MASON)
 
@@ -79,10 +79,10 @@ class UserItem(Resource):
         res = MasonBuilder()
         res["user"] = user.serialize()
         res.add_control("self", url_for("api.useritem", user=user))
-        res.add_control("exercises", url_for("api.exercisecollection", user=user))
-        res.add_control("measurements", url_for("api.measurementscollection", user=user))
-        res.add_control_delete("delete", url_for("api.useritem", user=user))
-        res.add_control_put("edit", url_for("api.useritem", user=user), User.json_schema())
+        res.add_control("fitnessbuddy:exercises-all", url_for("api.exercisecollection", user=user), title="All exercises")
+        res.add_control("fitnessbuddy:measurements-all", url_for("api.measurementscollection", user=user), title="All measurements")
+        res.add_control_delete("Delete user", url_for("api.useritem", user=user))
+        res.add_control_put("Edit user", url_for("api.useritem", user=user), User.json_schema())
         
         return Response(json.dumps(res), 200, mimetype=MASON)
 

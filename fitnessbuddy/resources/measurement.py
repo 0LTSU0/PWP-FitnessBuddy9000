@@ -33,7 +33,7 @@ class MeasurementsCollection(Resource):
         res = MasonBuilder()
         res["measurements"] = body
         res.add_control("self", url_for("api.measurementscollection", user=user))
-        res.add_control_post("add_measurement", "fitnessbuddy:addmeasurement", url_for("api.measurementscollection", user=user), Measurements.json_schema())
+        res.add_control_post("fitnessbuddy:add-measurement", "fitnessbuddy:addmeasurement", url_for("api.measurementscollection", user=user), Measurements.json_schema())
 
         # return users
         return Response(json.dumps(res), 200, mimetype=MASON)
@@ -68,8 +68,8 @@ class MeasurementsCollection(Resource):
 
         res = MasonBuilder()
         res.add_control("self", url_for("api.measurementsitem", user=measurement.user, measurements=measurement))
-        res.add_control_delete("delete", url_for("api.measurementsitem", user=measurement.user, measurements=measurement))
-        res.add_control_put("edit", url_for("api.measurementsitem", user=measurement.user, measurements=measurement), Measurements.json_schema())
+        res.add_control_delete("Delete measurements", url_for("api.measurementsitem", user=measurement.user, measurements=measurement))
+        res.add_control_put("Edit measurements", url_for("api.measurementsitem", user=measurement.user, measurements=measurement), Measurements.json_schema())
 
         return Response(json.dumps(res), 201, mimetype=MASON)
 

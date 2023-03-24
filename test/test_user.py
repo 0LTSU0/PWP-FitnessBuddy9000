@@ -136,7 +136,7 @@ def test_useritem_get(client):
     #Get user from valid url
     resp = client.get(resource_url_valid)
     assert resp.status_code == 200
-    res = json.loads(resp.data)
+    res = json.loads(resp.data)["user"]
     expected = get_user_dummy_data()
     assert res==expected[0]
 
@@ -167,7 +167,7 @@ def test_useritem_put(client):
     assert resp.status_code == 204
     #get updated user and check that it matches
     resp = client.get(resource_url_valid)
-    res = json.loads(resp.data)
+    res = json.loads(resp.data)["user"]
     assert res == updated_user
 
     #Put on not existing user

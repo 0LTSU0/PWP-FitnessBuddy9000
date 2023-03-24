@@ -172,7 +172,7 @@ def test_MeasurementsItem_get(client):
     # Get measurment record corresponding to user
     resp = client.get(resource_url_valid)
     assert resp.status_code == 200
-    res = json.loads(resp.data)
+    res = json.loads(resp.data)["exercise"]
     del res["id"]
     excepted = get_dummy_data_by_userid(3)
     assert res == excepted[0]
@@ -210,7 +210,7 @@ def test_MeasurementsItem_put(client):
     assert resp.status_code == 204
     resp = client.get(resource_url_valid)
     print(resp.data)
-    res = json.loads(resp.data)
+    res = json.loads(resp.data)["exercise"]
     print(res)
     del res["id"]
     assert res == updated_measurement
