@@ -147,10 +147,6 @@ paths:
               description: URI of the new user
               schema: 
                 type: string
-          content:
-            html:
-              example:
-                Returns empty response body and headers with a location of the new item. E.g. /api/users/1/
         '400':
           description: Invalid request body
           content:
@@ -311,10 +307,6 @@ paths:
               description: URI of the new exercise
               schema: 
                 type: string
-          content:
-            html:
-              example:
-                Returns empty response body and headers with a location of the new item. E.g. /api/users/1/exercises/1/
         '400':
           description: Invalid request body
           content:
@@ -391,7 +383,7 @@ paths:
               user_id: 1
               id: 1
       responses:
-        '201':
+        '204':
           description: Successfully edited exercise
           headers:
             Location: 
@@ -425,7 +417,7 @@ paths:
     delete:
       description: Delete existing exercise
       responses:
-        '200':
+        '204':
           description: Successfully deleted exercise
         '404':
           description: Not found
@@ -492,10 +484,6 @@ paths:
               description: URI of the new measurements item
               schema: 
                 type: string
-          content:
-            html:
-              example:
-                Returns empty response body and headers with a location of the new item. E.g. /api/users/1/measurements/1/
         '400':
           description: Invalid request body
           content:
@@ -608,7 +596,7 @@ paths:
     delete:
       description: Delete existing measurements
       responses:
-        '200':
+        '204':
           description: Successfully deleted measurements
         '404':
           description: Not found

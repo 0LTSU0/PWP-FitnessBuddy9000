@@ -65,7 +65,7 @@ class UserCollection(Resource):
         res.add_control_delete("delete", url_for("api.useritem", user=user))
         res.add_control_put("edit", url_for("api.useritem", user=user), User.json_schema())
 
-        return Response(json.dumps(res), 200, mimetype=MASON)
+        return Response(json.dumps(res), 201, mimetype=MASON)
 
 
 class UserItem(Resource):
