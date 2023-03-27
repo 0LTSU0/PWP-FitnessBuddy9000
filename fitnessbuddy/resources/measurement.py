@@ -88,7 +88,7 @@ class MeasurementsItem(Resource):
             )
         
         res = MasonBuilder()
-        res["exercise"] = measurements.serialize()
+        res["measurement"] = measurements.serialize()
         res.add_control("self", url_for("api.measurementsitem", user=measurements.user, measurements=measurements))
         return Response(json.dumps(res), 200, mimetype=MASON)
 
