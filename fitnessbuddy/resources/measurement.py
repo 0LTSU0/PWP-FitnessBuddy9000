@@ -33,6 +33,7 @@ class MeasurementsCollection(Resource):
         res = MasonBuilder()
         res["measurements"] = body
         res.add_control("self", url_for("api.measurementscollection", user=user))
+        res.add_control("fitnessbuddy:user", url_for("api.useritem", user=user))
         res.add_control_post("fitnessbuddy:add-measurement", "fitnessbuddy:addmeasurement", url_for("api.measurementscollection", user=user), Measurements.json_schema())
 
         # return users
@@ -68,8 +69,6 @@ class MeasurementsCollection(Resource):
 
         res = MasonBuilder()
         res.add_control("self", url_for("api.measurementsitem", user=measurement.user, measurements=measurement))
-        res.add_control_delete("Delete measurements", url_for("api.measurementsitem", user=measurement.user, measurements=measurement))
-        res.add_control_put("Edit measurements", url_for("api.measurementsitem", user=measurement.user, measurements=measurement), Measurements.json_schema())
 
         return Response(json.dumps(res), 201, mimetype=MASON)
 
@@ -90,6 +89,9 @@ class MeasurementsItem(Resource):
         res = MasonBuilder()
         res["measurement"] = measurements.serialize()
         res.add_control("self", url_for("api.measurementsitem", user=measurements.user, measurements=measurements))
+        res.add_control("fitnessbuddy:measurements-all", url_for("api.measurementscollection", user=user), title="All measurements")
+        res.add_control_delete("Delete measurements", url_for("api.measurementsitem", user=measurements.user, measurements=measurements))
+        res.add_control_put("Edit measurements", url_for("api.measurementsitem", user=measurements.user, measurements=measurements), Measurements.json_schema())
         return Response(json.dumps(res), 200, mimetype=MASON)
 
     def put(self, user, measurements):
