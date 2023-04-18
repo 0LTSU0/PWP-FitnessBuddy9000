@@ -11,6 +11,12 @@ from sqlalchemy import event
 import tools.populate_database
 import pytest
 
+user_schema = {'type': 'object', 'required': ['name', 'email', 'age', 'user_creation_date'], 'properties': 
+               {'name': {'description': "User's name", 'type': 'string'}, 
+                'email': {'description': "User's email", 'type': 'string'}, 
+                'age': {'description': "User's age", 'type': 'number'}, 
+                'user_creation_date': {'description': "User's creation datetime as a string", 'type': 'string'}}}
+
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
     """
@@ -83,6 +89,10 @@ def test_usercollection_post(client):
     #Valid exercise to valid user (also check that can be get)
     resp = client.post(resource_url_valid, json=valid_user)
     assert resp.status_code == 201
+    #Verify controls
+    controls = json.loads(resp.data)["@controls"]
+    expected = {'self': {'href': '/api/users/11/'}}
+    assert controls == expected
     resp = client.get(resource_url_valid)
     assert resp.status_code == 200
     #check that last user is the one we just added
@@ -117,10 +127,14 @@ def test_usercollection_get(client):
     assert resp.status_code == 200
     cont = json.loads(resp.data)["users"]
     excepted = get_user_dummy_data()
-    print("EX",excepted)
-    print("GOT:", cont)
     for item in cont:
         assert item in excepted
+
+    #Verify controls
+    controls = json.loads(resp.data)["@controls"]
+    expected = {'self': {'href': '/api/users/'}, 
+                'fitnessbuddy:add-user': {'method': 'POST', 'encoding': 'json', 'title': 'Add user', 'schema': user_schema, 'href': '/api/users/'}}
+    assert controls == expected
 
     #Get from invalid url
     resp = client.get(resource_url_invalid)
@@ -139,6 +153,16 @@ def test_useritem_get(client):
     res = json.loads(resp.data)["user"]
     expected = get_user_dummy_data()
     assert res==expected[0]
+
+    #Verify controls
+    controls = json.loads(resp.data)["@controls"]
+    expected = {'self': {'href': '/api/users/1/'}, 
+                'fitnessbuddy:exercises-all': {'title': 'All exercises', 'href': '/api/users/1/exercises/'}, 
+                'fitnessbuddy:measurements-all': {'title': 'All measurements', 'href': '/api/users/1/measurements/'}, 
+                'fitnessbuddy:users-all': {'title': 'All users', 'href': '/api/users/'}, 
+                'fitnessbuddy:delete': {'method': 'DELETE', 'title': 'Delete user', 'href': '/api/users/1/'}, 
+                'edit': {'method': 'PUT', 'encoding': 'json', 'title': 'Edit user', 'schema': user_schema, 'href': '/api/users/1/'}}
+    assert controls == expected
 
     #Get not existing user
     resp = client.get(resource_url_not_exist)
@@ -183,7 +207,7 @@ def test_useritem_put(client):
     assert resp.status_code == 400
 
 
-def test_useritem_del(client):
+def test_useritem_delete(client):
     """
     Function for testing delete method on UserItem resource
     """

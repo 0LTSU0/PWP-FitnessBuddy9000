@@ -23,6 +23,17 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
 
+
+exercise_schema = {'type': 'object', 
+                   'required': ['name', 'date', 'user_id'], 
+                   'properties': {'name': {'description': 'Name of the exercise', 'type': 'string'}, 
+                                  'date': {'description': 'Datetime of the exercise as a string', 'type': 'string'}, 
+                                  'user_id': {'description': 'User id', 'type': 'number'}, 
+                                  'duration': {'description': 'Duration of exercise', 'type': 'number'}
+                                  }
+                    }
+
+
 # based on https://github.com/enkwolf/pwp-course-sensorhub-api-example
 @pytest.fixture
 def client():
@@ -82,6 +93,13 @@ def test_ExerciseCollection_get(client):
         del item["id"] #dummy data has no id as it is just the primary key in db
         assert item in excepted
 
+    #Verify controls
+    controls = json.loads(resp.data)["@controls"]
+    expected = {'self': {'href': '/api/users/1/exercises/'}, 
+                'fitnessbuddy:user': {'href': '/api/users/1/'}, 
+                'fitnessbuddy:add-exercise': {'method': 'POST', 'encoding': 'json', 'title': 'fitnessbuddy:add-exercise', 'schema': exercise_schema, 'href': '/api/users/1/exercises/'}}
+    assert controls == expected
+
     #Get from nonexisting user
     resp = client.get(resource_url_invalid)
     assert resp.status_code == 404
@@ -107,6 +125,10 @@ def test_ExerciseCollection_post(client):
     #Valid exercise to valid user (also check that can be get)
     resp = client.post(resource_url_valid, json=valid_exercise)
     assert resp.status_code == 201
+    #Verify controls
+    controls = json.loads(resp.data)["@controls"]
+    expected = {'self': {'href': '/api/users/1/exercises/17/'}}
+    assert controls == expected
     resp = client.get(resource_url_valid)
     assert resp.status_code == 200
     res = json.loads(resp.data).get("exercises")[2]
@@ -145,6 +167,14 @@ def test_ExerciseItem_get(client):
     del res["id"]
     excepted = get_dummy_data_by_userid(1)
     assert res == excepted[0]
+
+    #Verify controls
+    controls = json.loads(resp.data)["@controls"]
+    excepted = {'self': {'href': '/api/users/1/exercises/1/'}, 
+                'fitnessbuddy:exercises-all': {'title': 'All exercises', 'href': '/api/users/1/exercises/'}, 
+                'fitnessbuddy:delete': {'method': 'DELETE', 'title': 'Delete exercise', 'href': '/api/users/1/exercises/1/'}, 
+                'edit': {'method': 'PUT', 'encoding': 'json', 'title': 'Edit exercise', 'schema': exercise_schema, 'href': '/api/users/1/exercises/1/'}}
+    assert controls == excepted
 
     #Get existing exercise but corresponding to wrong user
     resp = client.get(resource_url_valid_wrong_user)
