@@ -143,12 +143,6 @@ paths:
                   user_creation_date: '2023-01-01T01:00:00'
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     post:
       description: Create a new user
       requestBody:
@@ -221,12 +215,6 @@ paths:
                 message: The server does not support the media type transmitted in the request.
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
   /users/{user}/:
     parameters:
         - in: path
@@ -289,12 +277,6 @@ paths:
 
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     put:
       description: Edit existing user
       requestBody:
@@ -334,12 +316,6 @@ paths:
                 message: The server does not support the media type transmitted in the request.
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     delete:
       description: Delete existing user
       responses:
@@ -347,12 +323,6 @@ paths:
           description: Successfully deleted user
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
   /users/{user}/exercises/:
     parameters:
         - in: path
@@ -409,12 +379,6 @@ paths:
                   user_id: 1
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     post:
       description: Create a new exercise
       requestBody:
@@ -486,12 +450,6 @@ paths:
                 message: The server does not support the media type transmitted in the request.
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
   /users/{user}/exercises/{exercise}/:
     parameters:
         - in: path
@@ -532,12 +490,6 @@ paths:
                 message: Requested exercise does not correspond to requested user.
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     put:
       description: Edit existing exercise
       requestBody:
@@ -578,12 +530,6 @@ paths:
                 message: The server does not support the media type transmitted in the request.
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     delete:
       description: Delete existing exercise
       responses:
@@ -591,12 +537,6 @@ paths:
           description: Successfully deleted exercise
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
   /users/{user}/measurements/:
     parameters:
         - in: path
@@ -657,12 +597,6 @@ paths:
                   weight: 20.2
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     post:
       description: Create a new measurements item
       requestBody:
@@ -737,12 +671,6 @@ paths:
                 message: The server does not support the media type transmitted in the request.
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
   /users/{user}/measurements/{measurements}/:
     parameters:
         - in: path
@@ -783,12 +711,6 @@ paths:
                 message: Requested measurement does not correspond to requested user.
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     put:
       description: Edit existing measurements
       requestBody:
@@ -830,12 +752,6 @@ paths:
                 message: The server does not support the media type transmitted in the request.
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
     delete:
       description: Delete existing measurements
       responses:
@@ -843,9 +759,3 @@ paths:
           description: Successfully deleted measurements
         '404':
           description: Not found
-          content:
-            html:
-              example:
-                <title>404 Not Found</title>
-                <h1>Not Found</h1>
-                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
