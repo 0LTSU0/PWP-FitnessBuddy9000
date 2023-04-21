@@ -388,9 +388,13 @@ paths:
             schema:
               $ref: '#/components/schemas/Exercise'
             example:
-              name: Basketball
-              duration: 2656.0
-              date: "2023-02-11T13:01:56"
+              example1:
+                name: Basketball
+                duration: 2656.0
+                date: "2023-02-11T13:01:56"
+              example2:
+                name: Gym session
+                date: "2023-02-12T11:01:00"
       responses:
         '201':
           description: Successfully created a new exercise
@@ -606,10 +610,18 @@ paths:
             schema:
               $ref: '#/components/schemas/Measurements'
             example:
-              date: "2023-02-11T13:01:56"
-              weight: 66.0
-              calories_in: 2659.0
-              calories_out: 2664.0
+              example1:
+                date: "2023-02-11T13:01:56"
+                weight: 66.0
+                calories_in: 2659.0
+                calories_out: 2664.0
+              example2:
+                date: "2023-02-11T13:01:56"
+                weight: 70.0
+              example3:
+                date: "2023-02-11T13:01:56"
+                calories_in: 2559.0
+                calories_out: 2444.0
       responses:
         '201':
           description: Successfully created a new measurements item

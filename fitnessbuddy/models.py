@@ -107,6 +107,7 @@ class User(db.Model):
     measurements = db.relationship("Measurements", cascade="all, delete-orphan",
                                     back_populates="user")
     exercise = db.relationship("Exercise", cascade="all, delete-orphan", back_populates="user")
+    stats = db.relationship("Stats", cascade="all, delete-orphan", back_populates="user")
 
     def serialize(self):
         """
@@ -223,6 +224,76 @@ class Measurements(db.Model):
         }
         props["calories_out"] = {
             "description": "Calories burnt",
+            "type": "number"
+        }
+        return schema
+    
+class Stats(db.Model):
+    """
+    Database model for user stats
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, nullable=False)
+    total_exercises = db.Column(db.Integer, nullable=True)
+    daily_exercises = db.Column(db.Float, nullable=True)
+    daily_calories_in = db.Column(db.Float, nullable=True)
+    daily_calories_out = db.Column(db.Float, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="cascade"), nullable=False)
+
+    #initialize relationship
+    user = db.relationship("User", back_populates="stats")
+    
+    def serialize(self):
+        """
+        Function for serializing stats data
+        """
+        return{
+            "date": datetime.isoformat(self.date),
+            "total_exercises": self.total_exercises,
+            "daily_exercises": self.daily_exercises,
+            "daily_calories_in": self.daily_calories_in,
+            "daily_calories_out": self.daily_calories_out,
+            "user_id": self.user_id,
+            "id": self.id
+        }
+
+    def deserialize(self, doc):
+        """
+        Function for deserializing stats data
+        """
+        self.date = datetime.fromisoformat(str(doc["date"]))
+        self.total_exercises = doc["total_exercises"]
+        self.daily_exercises = doc["daily_exercises"]
+        self.daily_calories_in = doc["daily_calories_in"]
+        self.daily_calories_out = doc["daily_calories_out"]
+        self.user_id = doc["user_id"]
+        
+    @staticmethod
+    def json_schema():
+        schema = {
+            "type": "object",
+            "required": ["date", "total_exercises, daily_exercises, daily_calories_in, daily_calories_out"]
+        }
+        props = schema["properties"] = {}
+        props["generated"] = {
+            "description": "Datetime when these stats were generated",
+            "type": "string",
+            "format": "date-time"
+        }
+        props["total_exercises"] = {
+            "description": "Total amount of exercises this user has done",
+            "type": "number"
+        }
+        props["daily_exercises"] = {
+            "description": "Average number of exercises per day",
+            "type": "number"
+        }
+        props["daily_calories_in"] = {
+            "description": "Average number of calories eaten per day",
+            "type": "number"
+        }
+        props["daily_calories_out"] = {
+            "description": "Average number of calories burnt per day",
             "type": "number"
         }
         return schema
