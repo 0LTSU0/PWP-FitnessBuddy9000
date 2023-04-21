@@ -51,7 +51,7 @@ class MeasurementsCollection(Resource):
         try:
             validate(request.json, Measurements.json_schema())
         except ValidationError as error:
-            raise BadRequest() from error
+            raise BadRequest(description=str(error)) from error
 
         # initialize new user using deserializer
         try:

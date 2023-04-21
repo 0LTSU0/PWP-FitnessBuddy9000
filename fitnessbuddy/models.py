@@ -116,7 +116,8 @@ class User(db.Model):
             "name": self.name,
             "email": self.email,
             "age": self.age,
-            "user_creation_date": datetime.isoformat(self.user_creation_date)
+            "user_creation_date": datetime.isoformat(self.user_creation_date),
+            "id": self.id
         }
 
     def deserialize(self, doc):

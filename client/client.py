@@ -1,0 +1,259 @@
+import json
+import tkinter as tk
+import requests as req
+from datetime import datetime
+
+API = "http://127.0.0.1:5000/api/users/" #api entrypoint
+API_ADDR = "http://127.0.0.1:5000/" #api address for use with hypermedia
+USER = None
+HREFS = None
+
+#Based on https://stackoverflow.com/a/49325719
+class SampleApp(tk.Tk):
+    def __init__(self):
+        tk.Tk.__init__(self)
+        self._frame = None
+        self.switch_frame(StartPage)
+
+    def switch_frame(self, frame_class):
+        """Destroys current frame and replaces it with a new one."""
+        new_frame = frame_class(self)
+        if self._frame is not None:
+            self._frame.destroy()
+        self._frame = new_frame
+        self._frame.pack()
+
+
+class StartPage(tk.Frame):
+    def __init__(self, master):
+        tk.Frame.__init__(self, master)
+        tk.Label(self, text="FitnesbuddyAPI Client", font=("Arial", 25, "bold")).pack(side="top", fill="x", pady=20)
+        tk.Label(self, text="Select user:").pack()
+        
+        # To do anything with the api, a user needs to be specified
+        self.users = {}
+        self.error_visible = False
+        users_get = req.get(API).json()
+        for user in users_get.get("users"):
+            self.users[user.get("name")] = user.get("id")
+        sframe = tk.Frame(self)
+        listbox = tk.Listbox(
+            sframe,
+            listvariable=tk.Variable(value=list(self.users.keys())),
+            height=6,
+            selectmode=tk.SINGLE
+        )
+        listboxscroll = tk.Scrollbar(sframe, orient=tk.VERTICAL)
+        listboxscroll.config(command=listbox.yview)
+        listboxscroll.pack(side=tk.RIGHT, fill=tk.Y)
+        sframe.pack()
+        listbox.pack()
+        
+        tk.Button(self, text="Select",
+                  command=lambda: self.select_user(listbox, listbox.curselection())).pack(side="top", pady=10)
+        
+    def select_user(self, listbox, selection):
+        if not selection and not self.error_visible:
+            tk.Label(self, text="Select user to continue").pack(pady=10)
+            self.error_visible = True
+        elif selection:
+            global USER
+            USER = self.users.get(listbox.get(selection))
+            self.master.switch_frame(StatsPage)
+            
+
+
+class StatsPage(tk.Frame):
+    def __init__(self, master):
+        tk.Frame.__init__(self, master)
+        tk.Label(self, text="Stats", font=("Arial", 25, "bold")).pack(side="top", fill="x", pady=20)
+        
+        # Back to start and update stats buttons as well as frame for worker stats
+        sframe = tk.Frame(self)
+        statframe = tk.Frame(self)
+        tk.Button(sframe, text="Return to start",
+                  command=lambda: master.switch_frame(StartPage)).pack(side="left", padx=10)
+        tk.Button(sframe, text="Update stats",
+                  command=lambda: self.update_stats(statframe)).pack(side="left", padx=10)
+        sframe.pack()
+        tk.Label(statframe, text="Stats should appear here").pack()
+        statframe.pack(pady=40)
+
+        #Use hypermedia to find hrefs for adding measurements and exercises
+        global HREFS
+        HREFS = self.find_hrefs(["fitnessbuddy:add-exercise", "fitnessbuddy:add-measurement"])
+        
+        #Add buttons for the actions
+        aframe = tk.Frame(self)
+        tk.Button(aframe, text="Add Exercise",
+                  command=lambda: master.switch_frame(AddExercise)).pack(padx=10, side="left")
+        tk.Button(aframe, text="Add Measurement",
+                  command=lambda: master.switch_frame(AddMeasurement)).pack(padx=10, side="left")
+        aframe.pack()
+
+
+    def update_stats(self, statframe): #TODO: PUT STUFF HERE THAT MAKES POST AND UPDATES STATS TO GUI
+        for w in statframe.winfo_children():
+            w.destroy()
+        
+        rabbit_response = ["asd1", "sdf2", "dfg3"]
+        for item in rabbit_response:
+            tk.Label(statframe, text=item).pack()
+
+    
+    def find_hrefs(self, targets):
+        """
+        Loop controls to find desired targets
+        """
+        ret = {}
+        controls = req.get(f"{API}{USER}/").json().get("@controls")
+        for control in controls.values():
+            if not control.get("method") or control.get("method") == "GET":
+                res = req.get(API_ADDR + control.get("href")).json().get("@controls")
+                for t in targets:
+                    if t in res.keys():
+                        ret[t] = res.get(t)
+                        targets.remove(t)
+            if not targets:
+                break
+        return ret
+        
+
+class AddExercise(tk.Frame):
+    '''
+    Screen for posting exercises
+    '''
+    def __init__(self, master):
+        tk.Frame.__init__(self, master)
+        tk.Label(self, text="Add exercise", font=("Arial", 25, "bold")).pack(side="top", fill="x", pady=20)
+        
+        #Generate form based on schema
+        inputframe = tk.Frame(self)
+        inputframe = generate_form(inputframe, HREFS.get("fitnessbuddy:add-exercise"))
+        inputframe.pack()
+        
+        sframe = tk.Frame(self)
+        self.errframe = tk.Frame(self)
+        tk.Button(sframe, text="Back to stats",
+                  command=lambda: master.switch_frame(StatsPage)).pack(pady=20, padx=10, side="left")
+        tk.Button(sframe, text="Submit",
+                  command=lambda: self.submit(inputframe, HREFS.get("fitnessbuddy:add-exercise"))).pack(pady=20, padx=10, side="left")
+        sframe.pack()
+        self.errframe.pack()
+
+    def submit(self, inputframe, href):
+        success, response = submit(inputframe, href)
+        
+        #Clear possible error messages
+        for w in self.errframe.winfo_children():
+            w.destroy()
+        
+        #Flash new message
+        if not success:
+            response = response.get("message").replace("\n", "") #TODO make this nicer looking
+            tk.Label(self.errframe, text=response, fg='#ff1100', wraplength=self.winfo_width()).pack(padx=20)
+        else:
+            tk.Label(self.errframe, text="Exercise added successfully", fg='#00EB00', wraplength=self.winfo_width()).pack(padx=20)
+
+
+class AddMeasurement(tk.Frame):
+    '''
+    Screen for posting measurements
+    '''
+    def __init__(self, master):
+        tk.Frame.__init__(self, master)
+        tk.Label(self, text="Add measurements", font=("Arial", 25, "bold")).pack(side="top", fill="x", pady=20)
+        
+        #Generate form based on schema
+        inputframe = tk.Frame(self)
+        inputframe = generate_form(inputframe, HREFS.get("fitnessbuddy:add-measurement"))
+        inputframe.pack()
+        
+        sframe = tk.Frame(self)
+        self.errframe = tk.Frame(self)
+        tk.Button(sframe, text="Back to stats",
+                  command=lambda: master.switch_frame(StatsPage)).pack(pady=20, padx=10, side="left")
+        tk.Button(sframe, text="Submit",
+                  command=lambda: self.submit(inputframe, HREFS.get("fitnessbuddy:add-measurement"))).pack(pady=20, padx=10, side="left")
+        sframe.pack()
+        self.errframe.pack()
+
+    def submit(self, inputframe, href):
+        success, response = submit(inputframe, href)
+        
+        #Clear possible error messages
+        for w in self.errframe.winfo_children():
+            w.destroy()
+        
+        #Flash new message
+        if not success:
+            response = response.get("message").replace("\n", "") #TODO make this nicer looking
+            tk.Label(self.errframe, text=response, fg='#ff1100', wraplength=self.winfo_width()).pack(padx=20)
+        else:
+            tk.Label(self.errframe, text="Measurements added successfully", fg='#00EB00', wraplength=self.winfo_width()).pack(padx=20)
+
+
+def submit(inputframe, href):
+    """
+    Makes a post request to specified href based on stuff in inputframe
+    """
+
+    i = 0
+    prev_label = None
+    post = {}
+    for frame in inputframe.winfo_children():
+        #frame is constructed so that label, entry, label, entry
+        for item in frame.winfo_children():
+            if i % 2 == 0: #label
+                stripped = item.cget("text").strip(" ").strip("(*):")
+                post[stripped] = None
+                prev_label = stripped
+            else: #user inputted value
+                val = item.get()
+                if href.get("schema").get("properties").get(prev_label).get("type") == "number":
+                    try:
+                        val = float(val)
+                    except Exception:
+                        pass #api will give error message so just ignore for now
+                post[prev_label] = val
+            i += 1
+    
+    res = req.post(API_ADDR + href.get("href"), json=post)
+    if res.status_code != 201:
+        return False, json.loads(res.content.decode())
+    else:
+        return True, ""
+    
+
+def generate_form(iframe, instr):
+    """
+    Generates measurement adding screen based on stuff in schema
+    """
+
+    labels = list(instr.get("schema").get("properties").keys())
+    
+    #first add required fields
+    for item in instr.get("schema").get("required"): 
+        sframe = tk.Frame(iframe)
+        label = item + "(*): "
+        labels.remove(item)
+        tk.Label(sframe, text=label.ljust(30, " ")).pack(side="left")
+        tinput = tk.Entry(sframe, width = 30)
+        if item == "date": #prefill date because format
+            tinput.insert(0, datetime.now().isoformat())
+        tinput.pack(side="left")
+        sframe.pack()
+    for item in labels: #then optional
+        sframe = tk.Frame(iframe)
+        label = item + ": "
+        tk.Label(sframe, text=label.ljust(30, " ")).pack(side="left")
+        tinput = tk.Entry(sframe, width = 30).pack(side="left")
+        sframe.pack()
+    
+    return iframe
+
+
+if __name__ == "__main__":
+    app = SampleApp()
+    app.geometry("400x500")
+    app.mainloop()
