@@ -272,13 +272,17 @@ class Stats(db.Model):
     def json_schema():
         schema = {
             "type": "object",
-            "required": ["date", "total_exercises, daily_exercises, daily_calories_in, daily_calories_out"]
+            "required": ["date", "user_id"]
         }
         props = schema["properties"] = {}
-        props["generated"] = {
+        props["date"] = {
             "description": "Datetime when these stats were generated",
             "type": "string",
             "format": "date-time"
+        }
+        props["user_id"] = {
+            "description": "User id",
+            "type": "number"
         }
         props["total_exercises"] = {
             "description": "Total amount of exercises this user has done",

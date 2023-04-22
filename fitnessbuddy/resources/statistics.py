@@ -1,12 +1,10 @@
 import json
 import pika
 import ssl
-from datetime import datetime
 from flask import Response, request, url_for
 from flask_restful import Resource
 from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
-from sqlalchemy.exc import IntegrityError
 from fitnessbuddy.models import db, User, Stats, Measurements, Exercise
 from fitnessbuddy.utils import MasonBuilder
 
@@ -18,31 +16,51 @@ context.verify_mode = ssl.CERT_NONE
 
 class UserStats(Resource):
     """
-    Resource for user's statistics. Methods: get, put, delete
+    Resource for user's statistics. Methods: get, post, delete
     """
     def get(self, user):
         """
-        Method for generating new user statistics.
+        Method for generating new user statistics whenever clients sents a get request.
         """
-        #delete old stats
         if user.stats:
-            db.session.delete(user.stats)
-            db.session.commit()
-        #send task to generate new stats
-        self.send_task(user)
-        return Response(status=202)
+            #TODO return old stats
+            print("RETURNING STATS")
+            pass
+        else:
+            #send task to generate new stats
+            self.send_task(user)
+            return Response(status=202)
 
-    def put(self, user):
+    def post(self, user):
         """
-        Method for editing existing user statistics
+        Method for posting new user statistics
         """
-        pass
+        print("GOT new post request")
+        #check that request is json and has correct user id
+        if not request.is_json:
+            raise UnsupportedMediaType
+        if request.json.get("user_id"):
+            if not request.json["user_id"] == user.id:
+                raise BadRequest(description="UserID mismatch in request address and body")
+        #check json schema
+        try:
+            validate(request.json, Stats.json_schema())
+        except ValidationError as error:
+            raise BadRequest(description=str(error)) from error
+        
+        stats = Stats()
+        stats.user = user
+        stats.deserialize(request.json)
+        db.session.add(stats)
+        db.session.commit()
+        return Response(status=204)
 
     def delete(self, user):
         """
-        Method for deleting existing statistics
+        Method for deleting all existing statistics
         """
-        db.session.delete(user.stats)
+        for item in Stats.query.filter_by(user=user).all():
+            db.session.delete(item)
         db.session.commit()
         return Response(status=204)
     
@@ -60,8 +78,8 @@ class UserStats(Resource):
         
         res["exercises"] = body_excr
         res["measurements"] = body_meas
-
-        #body.add_control_modify_stats(sensor)
+        
+        res.add_control_post("fitnessbuddy:add-stats", "Post new stats", url_for("api.userstats", user=user), Stats.json_schema())
 
         #connect to rabbitMQ
         connection = pika.BlockingConnection(

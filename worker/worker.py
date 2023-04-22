@@ -20,12 +20,31 @@ channel = None
 def handle_task(channel, method, properties, body):
     print("\nHandling task")
     #wait a few seconds just for fun
-    time.sleep(randint(3,6))
+    time.sleep(randint(2,4))
 
     try:
         task = json.loads(body)
-        print("Exercises: ", task["exercises"])
-        print("Measurements: ", task["measurements"])
+        href = API_SERVER + task["@controls"]["fitnessbuddy:add-stats"]["href"]
+        print("Body: \n", task, "\n")
+
+        #TEMP test that post works
+        #these stats should be calculated from the input json
+        new_stats = {
+            "date": datetime.isoformat(datetime.now()),
+            "user_id": 1,
+            "total_exercises": 15,
+            "daily_exercises": 0.8,
+            "daily_calories_in": 2575.6,
+            "daily_calories_out": 2575.6
+        }
+        #send post request to url given in controls
+        with requests.Session() as session:
+            print("Sending post request to: ", href)
+            resp = session.post(
+                href,
+                json=new_stats
+            )
+        
     except (KeyError, json.JSONDecodeError) as e:
         print("ERROR:", e)
 
