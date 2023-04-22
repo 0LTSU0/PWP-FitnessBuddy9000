@@ -1,7 +1,11 @@
 import json
+import threading
+import pathlib
 import tkinter as tk
 import requests as req
 from datetime import datetime
+from pika_listener import STATS, listen_notifications
+import time
 
 API = "http://127.0.0.1:5000/api/users/" #api entrypoint
 API_ADDR = "http://127.0.0.1:5000/" #api address for use with hypermedia
@@ -76,7 +80,7 @@ class StatsPage(tk.Frame):
         tk.Button(sframe, text="Update stats",
                   command=lambda: self.update_stats(statframe)).pack(side="left", padx=10)
         sframe.pack()
-        tk.Label(statframe, text="Stats should appear here").pack()
+        tk.Label(statframe, text="Click 'Update stats' to get your stats").pack()
         statframe.pack(pady=40)
 
         #Use hypermedia to find hrefs for adding measurements and exercises
@@ -92,13 +96,37 @@ class StatsPage(tk.Frame):
         aframe.pack()
 
 
-    def update_stats(self, statframe): #TODO: PUT STUFF HERE THAT MAKES POST AND UPDATES STATS TO GUI
+    def update_stats(self, statframe):
+        '''
+        Callback for update stats button
+        '''
         for w in statframe.winfo_children():
             w.destroy()
-        
-        rabbit_response = ["asd1", "sdf2", "dfg3"]
-        for item in rabbit_response:
-            tk.Label(statframe, text=item).pack()
+
+        res = req.get(f"{API}{USER}/stats/") #TODO: USE CONTROLS
+
+        if res.status_code == 202: #need to wait for stats
+            tk.Label(statframe, text="Waiting for stats...").pack(pady=20)
+            statframe.after(10, lambda : self.draw_stats(statframe))
+        else: #stats are in response, draw immediately
+            pass
+
+
+    def draw_stats(self, statframe):
+        '''
+        Function to keep calling in the backgroud until stats arrive from pika listener
+        '''
+        if STATS.qsize() == 0:
+            statframe.after(10, self.draw_stats, statframe)
+        else:
+            stats = STATS.get()
+            for w in statframe.winfo_children():
+                w.destroy()
+            for key, value in stats.items():
+                sframe = tk.Frame(statframe)
+                tk.Label(sframe, text=key, width=20).pack(side="left")
+                tk.Label(sframe, text=value, width=25).pack(side="left")
+                sframe.pack()
 
     
     def find_hrefs(self, targets):
@@ -202,7 +230,7 @@ def submit(inputframe, href):
     prev_label = None
     post = {}
     for frame in inputframe.winfo_children():
-        #frame is constructed so that label, entry, label, entry
+        #frame is constructed so that label, entry, label, entry,...
         for item in frame.winfo_children():
             if i % 2 == 0: #label
                 stripped = item.cget("text").strip(" ").strip("(*):")
@@ -232,8 +260,7 @@ def generate_form(iframe, instr):
 
     labels = list(instr.get("schema").get("properties").keys())
     
-    #first add required fields
-    for item in instr.get("schema").get("required"): 
+    for item in instr.get("schema").get("required"): #first add required fields
         sframe = tk.Frame(iframe)
         label = item + "(*): "
         labels.remove(item)
@@ -254,6 +281,14 @@ def generate_form(iframe, instr):
 
 
 if __name__ == "__main__":
+    #pika listener
+    credential_path = pathlib.Path(__file__).parent.joinpath("pikacredentials.json")
+    with open(credential_path) as f:
+        cred = json.load(f)
+        pikath = threading.Thread(target=listen_notifications, args=(cred.get("user"), cred.get("password")), daemon=True)
+        pikath.start()
+
+    #client
     app = SampleApp()
     app.geometry("400x500")
     app.mainloop()

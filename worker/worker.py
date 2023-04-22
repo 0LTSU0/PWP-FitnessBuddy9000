@@ -51,6 +51,11 @@ def handle_task(channel, method, properties, body):
     finally:
         # acknowledge the task regardless of outcome
         print("Task handled")
+        channel.basic_publish(
+            exchange="notifications",
+            routing_key="",
+            body=json.dumps(new_stats)
+        )
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
 def main():
