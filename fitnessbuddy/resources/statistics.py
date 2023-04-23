@@ -90,6 +90,7 @@ class UserStats(Resource):
         
         res["exercises"] = body_excr
         res["measurements"] = body_meas
+        res["user"] = user.serialize()
         
         res.add_control_post("fitnessbuddy:add-stats", "Post new stats", url_for("api.userstats", user=user), Stats.json_schema())
 

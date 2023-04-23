@@ -32,7 +32,7 @@ def handle_task(channel, method, properties, body):
         #these stats should be calculated from the input json
         new_stats = {
             "date": datetime.isoformat(datetime.now()),
-            "user_id": 1,
+            "user_id": task["user"]["id"],
             "total_exercises": 15,
             "daily_exercises": 0.8,
             "daily_calories_in": 2575.6,
