@@ -1,4 +1,3 @@
-import math
 import os
 import sys
 from random import randint
@@ -16,6 +15,8 @@ context.verify_mode = ssl.CERT_NONE
 API_SERVER = "http://localhost:5000"
 
 channel = None
+usr = ""
+pwd = ""
 
 def handle_task(channel, method, properties, body):
     print("\nHandling task")
@@ -65,7 +66,7 @@ def main():
                 host="193.167.189.95",
                 port=5672,
                 virtual_host="ryhma-jll-vhost",
-                credentials=pika.PlainCredentials("ryhma-jll", "6iWuvvYAF1R88k4WP43tmnqTPzqAWVaPu3OMRdkqb4k"),
+                credentials=pika.PlainCredentials(usr, pwd),
                 ssl_options=pika.SSLOptions(context)
             )
         )
@@ -87,6 +88,15 @@ def main():
     channel.start_consuming()
     
 if __name__ == "__main__":
+    #get credentials from \client directory
+    cwd = os.getcwd()
+    cwd = cwd.replace("worker", "client")
+    credentials_file = str("{}\pikacredentials.json".format(cwd))
+    with open(credentials_file) as f:
+        cred = json.load(f)
+        usr = cred.get("user")
+        pwd = cred.get("password")
+
     try:
         main()
     except KeyboardInterrupt:

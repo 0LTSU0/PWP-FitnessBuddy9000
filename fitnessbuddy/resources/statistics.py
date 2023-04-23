@@ -1,11 +1,12 @@
 import json
 import pika
+import os
 import ssl
 from flask import Response, request, url_for
 from flask_restful import Resource
 from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
-from fitnessbuddy.models import db, User, Stats, Measurements, Exercise
+from fitnessbuddy.models import db, Stats, Measurements, Exercise
 from fitnessbuddy.utils import MasonBuilder
 
 MASON = "application/vnd.mason+json"
@@ -13,6 +14,17 @@ MASON = "application/vnd.mason+json"
 context = ssl.create_default_context()
 context.check_hostname = False
 context.verify_mode = ssl.CERT_NONE
+
+usr = ""
+pwd = ""
+
+#get credentials from \client directory
+cwd = os.getcwd()
+credentials_file = str("{}\client\pikacredentials.json".format(cwd))
+with open(credentials_file) as f:
+    cred = json.load(f)
+    usr = cred.get("user")
+    pwd = cred.get("password")
 
 class UserStats(Resource):
     """
@@ -22,14 +34,14 @@ class UserStats(Resource):
         """
         Method for generating new user statistics whenever clients sents a get request.
         """
-        if user.stats:
-            #TODO return old stats
-            print("RETURNING STATS")
-            pass
-        else:
-            #send task to generate new stats
-            self.send_task(user)
-            return Response(status=202)
+        #delete old stats
+        for item in Stats.query.filter_by(user=user).all():
+            db.session.delete(item)
+        db.session.commit()
+
+        #send task to generate new stats
+        self.send_task(user)
+        return Response(status=202)
 
     def post(self, user):
         """
@@ -87,7 +99,7 @@ class UserStats(Resource):
                 host="193.167.189.95",
                 port=5672,
                 virtual_host="ryhma-jll-vhost",
-                credentials=pika.PlainCredentials("ryhma-jll", "6iWuvvYAF1R88k4WP43tmnqTPzqAWVaPu3OMRdkqb4k"),
+                credentials=pika.PlainCredentials(usr, pwd),
                 ssl_options=pika.SSLOptions(context)
             )
         )
