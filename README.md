@@ -11,28 +11,54 @@ __Remember to include all required documentation and HOWTOs, including how to cr
 # Requirements
 Required external libraries can be found in requirements.txt
 
-# App
-Running the app:
+# Running API, Client and auxilary service
+Running the API:
 
 Linux
-- export FLASK_APP=fitnessbuddy
-- export FLASK_ENV=development
-- flask init-db
-- flask run
+- API:
+    - export FLASK_APP=fitnessbuddy
+    - export FLASK_ENV=development
+    - flask init-db
+    - (optional: flask fill-db)
+    - flask run
+- Auxilary service worker (in /worker. Also need to have pika credential json in /client)
+    - python3 worker.py
+- Client (in /client. Also need to have pika credential json here)
+    - python3 client.py
 
 Windows
-- set FLASK_APP=fitnessbuddy
-- set FLASK_ENV=development
-- flask init-db
-- flask run
+- API:
+    - set FLASK_APP=fitnessbuddy
+    - set FLASK_ENV=development
+    - flask init-db
+    - (optional: flask fill-db)
+    - flask run
+- Auxilary service worker (in /worker. Also need to have pika credential json in /client)
+    - python worker.py
+- Client (in /client. Also need to have pika credential json here)
+    - python client.py
 
 # Tests
 Running tests:
 
 Linux
-in PWP-FitnessBuddy9000/test run python3 -m pytest
+in PWP-FitnessBuddy9000/test/ run: python3 -m pytest
 
 Windows
-in PWP-FitnessBuddy9000/test run run_pytest.bat
+in PWP-FitnessBuddy9000/test/ run: run_pytest.bat
 
 
+# Database (outdated)
+
+## Dependancies
+Database is implemented using SQLAlchemy. List of requirements for using/testing the database are in requirements.txt
+
+## Playing with databsae manually (and populating it with dummy data)
+In ..\PWP-FitnessBuddy9000 run the following commands:
+- "python3"
+- ">>> from database.models import *"
+- ">>> from tools.populate_database import *" 
+- ">>> app, db = create_app()"
+- ">>> db.create_all()"
+- ">>> populate_database(db, app)"
+- Run wanted commands e.g. ">>> User.query.filter_by(id=1)[0].name"
