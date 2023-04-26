@@ -1,21 +1,30 @@
-import pika
+"""
+Pika listener implementation for use with client
+"""
+
 import ssl
 import json
 import queue
+import pathlib
+import pika
 
 STATS = queue.Queue(1) #allow only one set of stats
 
 def listen_notifications(user, pwd):
+    """
+    Based on course example
+    """
     context = ssl.create_default_context()
     context.check_hostname = False
     context.verify_mode = ssl.CERT_NONE
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host="193.167.189.95",
-                                                                   port=5672,
-                                                                   virtual_host="ryhma-jll-vhost",
-                                                                   credentials=pika.PlainCredentials(user, pwd),
-                                                                   ssl_options=pika.SSLOptions(context)))
-    
+    connection = pika.BlockingConnection(
+                pika.ConnectionParameters(host="193.167.189.95",
+                                          port=5672,
+                                          virtual_host="ryhma-jll-vhost",
+                                          credentials=pika.PlainCredentials(user, pwd),
+                                          ssl_options=pika.SSLOptions(context)))
+
     channel = connection.channel()
     channel.exchange_declare(
         exchange="notifications",
@@ -35,13 +44,17 @@ def listen_notifications(user, pwd):
     channel.start_consuming()
 
 
-def notification_handler(ch, method, properties, body):
-    print("notification with status received")
+def notification_handler(channel, method, properties, body):
+    """
+    Handler for incoming notifications
+    """
+    print("notification received: ", body)
     global STATS
     STATS.queue.clear()
     STATS.put(json.loads(body))
 
 if __name__ == "__main__":
-    with open(r"C:\Users\lauri\Desktop\YO\pwp_git\PWP-FitnessBuddy9000\client\pikacredentials.json") as f:
+    filepath = pathlib.Path(__file__).parent.joinpath("pikacredentials.json")
+    with open(filepath, "r", encoding="utf-8") as f:
         cred = json.load(f)
         listen_notifications(cred.get("user"), cred.get("password"))
