@@ -77,6 +77,7 @@ def test_usercollection_post(client):
     resource_url_invalid = "/api/ubers/"
     valid_user = {
         "name": "niilo",
+        "id": 11,
         "email": "example@com",
         "age": 22,
         "user_creation_date": datetime.isoformat(datetime.now()),
@@ -177,6 +178,7 @@ def test_useritem_put(client):
     resource_url_not_exist = "/api/users/999/"
     updated_user = {
         "name": "niilo",
+        "id": 1,
         "email": "example@com",
         "age": 22,
         "user_creation_date": datetime.isoformat(datetime.now()),

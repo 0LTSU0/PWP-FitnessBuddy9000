@@ -19,7 +19,10 @@ usr = ""
 pwd = ""
 
 #get credentials from \client directory
-cwd = os.getcwd()
+cwd = str(os.getcwd())
+#if this is executed by pytest we have to remove "test" from the path
+if "test" in cwd:
+    cwd = cwd.replace("\\test", "")
 credentials_file = str("{}\client\pikacredentials.json".format(cwd))
 with open(credentials_file) as f:
     cred = json.load(f)
@@ -47,7 +50,6 @@ class UserStats(Resource):
         """
         Method for posting new user statistics
         """
-        print("GOT new post request")
         #check that request is json and has correct user id
         if not request.is_json:
             raise UnsupportedMediaType
@@ -60,11 +62,15 @@ class UserStats(Resource):
         except ValidationError as error:
             raise BadRequest(description=str(error)) from error
         
+        #generate new stats by deserializing json
         stats = Stats()
-        stats.user = user
         stats.deserialize(request.json)
+        stats.user = user
         db.session.add(stats)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as exeption:
+            return Response(str(exeption), status=400)
         return Response(status=204)
 
     def delete(self, user):
