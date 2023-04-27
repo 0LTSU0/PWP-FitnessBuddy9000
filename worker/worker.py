@@ -109,13 +109,18 @@ def compute_stats(body):
         sum_of_calories_out += body["measurements"][i]["calories_out"]
     
     length = len(body["exercises"])
+
     try:
         avg_exercise = length / difference.days
-        avg_calories_in = sum_of_calories_in / len(body["measurements"])
-        avg_calories_out = sum_of_calories_out / len(body["measurements"])
     except ZeroDivisionError:
         avg_exercise = 0
+    try:
+        avg_calories_in = sum_of_calories_in / len(body["measurements"])
+    except ZeroDivisionError:
         avg_calories_in = 0
+    try:
+        avg_calories_out = sum_of_calories_out / len(body["measurements"])
+    except ZeroDivisionError:
         avg_calories_out = 0
     
     return round(avg_exercise, 2), round(avg_calories_in, 2), round(avg_calories_out, 2)
