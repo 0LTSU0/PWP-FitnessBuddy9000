@@ -23,7 +23,7 @@ USR = ""
 PWD = ""
 
 #get credentials from \client directory
-CWD = str(os.getCWD())
+CWD = str(os.getcwd())
 #if this is executed by pytest we have to remove "test" from the path
 if "test" in CWD:
     CWD = CWD.replace("\\test", "")
