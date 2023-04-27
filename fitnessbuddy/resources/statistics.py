@@ -67,10 +67,8 @@ class UserStats(Resource):
         stats.deserialize(request.json)
         stats.user = user
         db.session.add(stats)
-        try:
-            db.session.commit()
-        except Exception as exeption:
-            return Response(str(exeption), status=400)
+        db.session.commit()
+
         return Response(status=204)
 
     def delete(self, user):

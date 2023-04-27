@@ -54,10 +54,7 @@ class ExerciseCollection(Resource):
 
         #Add entry to db
         db.session.add(exrc)
-        try:
-            db.session.commit()
-        except Exception as exeption:
-            return Response(str(exeption), status=400)
+        db.session.commit()
         
         res = MasonBuilder()
         res.add_control("self", url_for("api.exerciseitem", user=exrc.user, exercise=exrc))
@@ -102,14 +99,11 @@ class ExerciseItem(Resource):
             raise BadRequest(description=str(err)) from err
 
         #update database entry
-        try:
-            exercise.name = request.json["name"]
-            exercise.duration = request.json["duration"]
-            exercise.user_id = request.json["user_id"]
-            exercise.date = datetime.fromisoformat(request.json["date"])
-            db.session.commit()
-        except Exception as err:
-            return Response(str(err), status=400)
+        exercise.name = request.json["name"]
+        exercise.duration = request.json["duration"]
+        exercise.user_id = request.json["user_id"]
+        exercise.date = datetime.fromisoformat(request.json["date"])
+        db.session.commit()
 
         #204 has no response body
         return Response(status=204, headers={"location":str(url_for("api.exerciseitem",
@@ -119,10 +113,7 @@ class ExerciseItem(Resource):
         """
         Delete method for ExerciseItem
         """
-        try:
-            db.session.delete(exercise)
-            db.session.commit()
-        except Exception as err:
-            Response(str(err), status=400)
+        db.session.delete(exercise)
+        db.session.commit()
 
         return Response("Entry deleted", status=204)

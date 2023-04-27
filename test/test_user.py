@@ -161,7 +161,8 @@ def test_useritem_get(client):
                 'fitnessbuddy:exercises-all': {'title': 'All exercises', 'href': '/api/users/1/exercises/'}, 
                 'fitnessbuddy:measurements-all': {'title': 'All measurements', 'href': '/api/users/1/measurements/'}, 
                 'fitnessbuddy:users-all': {'title': 'All users', 'href': '/api/users/'}, 
-                'fitnessbuddy:delete': {'method': 'DELETE', 'title': 'Delete user', 'href': '/api/users/1/'}, 
+                'fitnessbuddy:delete': {'method': 'DELETE', 'title': 'Delete user', 'href': '/api/users/1/'},
+                'fitnessbuddy:stats': {'title': 'Stats', 'href': '/api/users/1/stats/'},
                 'edit': {'method': 'PUT', 'encoding': 'json', 'title': 'Edit user', 'schema': user_schema, 'href': '/api/users/1/'}}
     assert controls == expected
 

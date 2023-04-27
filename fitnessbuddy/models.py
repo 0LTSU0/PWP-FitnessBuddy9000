@@ -9,28 +9,6 @@ from flask import Flask
 from flask.cli import with_appcontext
 from fitnessbuddy import db
 
-def create_app():
-    """
-    Function for creating test app for test.db
-    """
-    app = Flask(__name__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db.init_app(app)
-    app.app_context().push()
-    return app, db
-
-def create_test_app():
-    """
-    Function for creating test app for pytest.db
-    """
-    app = Flask(__name__)
-    app.config['TESTING'] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///pytest.db"
-    db.init_app(app)
-    app.app_context().push()
-    return app, db
-
 class Exercise(db.Model):
     """
     Database model for exercise information

@@ -55,10 +55,7 @@ class UserCollection(Resource):
 
         #add new user to database
         db.session.add(user)
-        try:
-            db.session.commit()
-        except IntegrityError:
-            return Response(status=400)
+        db.session.commit()
         
         res = MasonBuilder()
         res.add_control("self", url_for("api.useritem", user=user))
@@ -100,14 +97,11 @@ class UserItem(Resource):
             raise BadRequest(description=str(error)) from error
 
         #update database entry
-        try:
-            user.name = request.json["name"]
-            user.email = request.json["email"]
-            user.age = request.json["age"]
-            user.user_creation_date = datetime.fromisoformat(request.json["user_creation_date"])
-            db.session.commit()
-        except Exception as error:
-            return Response(str(error), status=400)
+        user.name = request.json["name"]
+        user.email = request.json["email"]
+        user.age = request.json["age"]
+        user.user_creation_date = datetime.fromisoformat(request.json["user_creation_date"])
+        db.session.commit()
         
         #204 has no response body
         return Response(status=204, headers={"location":url_for("api.useritem", user=user)})

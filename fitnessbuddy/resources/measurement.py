@@ -54,18 +54,12 @@ class MeasurementsCollection(Resource):
             raise BadRequest(description=str(error)) from error
 
         # initialize new user using deserializer
-        try:
-            measurement = Measurements()
-            measurement.deserialize(request.json)
-            measurement.user = user
-        except (KeyError, ValueError, IntegrityError) as error:
-            raise BadRequest() from error
+        measurement = Measurements()
+        measurement.deserialize(request.json)
+        measurement.user = user
         # add new user to database
         db.session.add(measurement)
-        try:
-            db.session.commit()
-        except (KeyError, ValueError, IntegrityError):
-            return Response(str(error), status=400)
+        db.session.commit()
 
         res = MasonBuilder()
         res.add_control("self", url_for("api.measurementsitem", user=measurement.user, measurements=measurement))
@@ -106,8 +100,7 @@ class MeasurementsItem(Resource):
                 raise BadRequest(
                     description="UserID mismatch in request address and body"
                 )
-        else:
-            request.json["user_id"] = user.id
+
         # check json schema
         try:
             validate(request.json, Measurements.json_schema())
@@ -115,15 +108,12 @@ class MeasurementsItem(Resource):
             raise BadRequest() from error
 
         # update database entry
-        try:
-            measurements.date = datetime.fromisoformat(request.json["date"])
-            measurements.weight = request.json["weight"]
-            measurements.calories_in = request.json["calories_in"]
-            measurements.calories_out = request.json["calories_out"]
-            measurements.user_id = request.json["user_id"]
-            db.session.commit()
-        except (KeyError, ValueError, IntegrityError) as error:
-            return Response(str(error), status=400)
+        measurements.date = datetime.fromisoformat(request.json["date"])
+        measurements.weight = request.json["weight"]
+        measurements.calories_in = request.json["calories_in"]
+        measurements.calories_out = request.json["calories_out"]
+        measurements.user_id = request.json["user_id"]
+        db.session.commit()
         return Response(
             status=204,
             headers={
