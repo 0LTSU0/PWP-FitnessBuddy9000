@@ -24,6 +24,9 @@ USR = ""
 PWD = ""
 
 def log_error(message):
+    """
+    Logs errors
+    """
     CHANNEL.basic_publish(
         exchange="logs",
         routing_key="",
@@ -59,14 +62,14 @@ def handle_task(channel, method, properties, body):
         }
         #send post request to url given in controls
         with requests.Session() as session:
-            print("Sending post request to: ", href)
+            print(f"Sending post request to: {href}")
             resp = session.post(
                 href,
                 json=new_stats
             )
             if resp.status_code != 204:
                 # log error 
-                log_error(f"Unable to send result")
+                log_error("Unable to send result")
 
         channel.basic_publish(
             exchange="notifications",
@@ -87,23 +90,27 @@ def compute_stats(body):
     Computes daily averages.
     Returns average number of daily exercises, calories_in, and calories_out
     """
-    date_counts = OrderedDict()
+    measurement_date_counts = OrderedDict()
     sum_of_calories_in = 0
     sum_of_calories_out = 0
+
+    creaton_date  = datetime.fromisoformat(body["user"]["user_creation_date"])
+    current_date = datetime.today()
+    difference = current_date - creaton_date
+
     for i in range(len(body["measurements"])):
         try:
-            in_date_format = datetime.fromisoformat(body["measurements"][i]["date"])
-            date_counts[in_date_format.date()] += 1
+            in_date_format_measurement = datetime.fromisoformat(body["measurements"][i]["date"])
+            measurement_date_counts[in_date_format_measurement.date()] += 1
         except KeyError:
-            date_counts[in_date_format.date()] = 1
+            measurement_date_counts[in_date_format_measurement.date()] = 1
         
         sum_of_calories_in += body["measurements"][i]["calories_in"]
         sum_of_calories_out += body["measurements"][i]["calories_out"]
     
-    length = len(date_counts)
-    exercise_sum = sum(date_counts.values())
+    length = len(body["exercises"])
     try:
-        avg_exercise = exercise_sum / length
+        avg_exercise = length / difference.days
         avg_calories_in = sum_of_calories_in / len(body["measurements"])
         avg_calories_out = sum_of_calories_out / len(body["measurements"])
     except ZeroDivisionError:
