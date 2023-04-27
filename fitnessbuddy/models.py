@@ -5,7 +5,6 @@ import os
 import json
 from datetime import datetime
 import click
-from flask import Flask
 from flask.cli import with_appcontext
 from fitnessbuddy import db
 
@@ -205,7 +204,7 @@ class Measurements(db.Model):
             "type": "number"
         }
         return schema
-    
+
 class Stats(db.Model):
     """
     Database model for user stats
@@ -220,7 +219,7 @@ class Stats(db.Model):
 
     #initialize relationship
     user = db.relationship("User", back_populates="stats")
-    
+
     def serialize(self):
         """
         Function for serializing stats data
@@ -245,7 +244,7 @@ class Stats(db.Model):
         self.daily_calories_in = doc["daily_calories_in"]
         self.daily_calories_out = doc["daily_calories_out"]
         self.user_id = doc["user_id"]
-        
+
     @staticmethod
     def json_schema():
         schema = {

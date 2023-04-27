@@ -1,7 +1,11 @@
-import json
-import pika
+"""
+Statistics model implementations
+"""
+
 import os
 import ssl
+import json
+import pika
 from flask import Response, request, url_for
 from flask_restful import Resource
 from jsonschema import validate, ValidationError
@@ -15,19 +19,19 @@ context = ssl.create_default_context()
 context.check_hostname = False
 context.verify_mode = ssl.CERT_NONE
 
-usr = ""
-pwd = ""
+USR = ""
+PWD = ""
 
 #get credentials from \client directory
-cwd = str(os.getcwd())
+CWD = str(os.getCWD())
 #if this is executed by pytest we have to remove "test" from the path
-if "test" in cwd:
-    cwd = cwd.replace("\\test", "")
-credentials_file = str("{}\client\pikacredentials.json".format(cwd))
-with open(credentials_file) as f:
+if "test" in CWD:
+    CWD = CWD.replace("\\test", "")
+credentials_file = str("{}\client\pikacredentials.json".format(CWD))
+with open(credentials_file, encoding="utf-8") as f:
     cred = json.load(f)
-    usr = cred.get("user")
-    pwd = cred.get("password")
+    USR = cred.get("user")
+    PWD = cred.get("password")
 
 class UserStats(Resource):
     """
@@ -61,7 +65,7 @@ class UserStats(Resource):
             validate(request.json, Stats.json_schema())
         except ValidationError as error:
             raise BadRequest(description=str(error)) from error
-        
+
         #generate new stats by deserializing json
         stats = Stats()
         stats.deserialize(request.json)
@@ -79,7 +83,7 @@ class UserStats(Resource):
             db.session.delete(item)
         db.session.commit()
         return Response(status=204)
-    
+
     def send_task(self, user):
         #get current data from user
         body_excr = []
@@ -91,12 +95,13 @@ class UserStats(Resource):
         for item in Measurements.query.filter_by(user=user).all():
             measurement_item = item.serialize()
             body_meas.append(measurement_item)
-        
+
         res["exercises"] = body_excr
         res["measurements"] = body_meas
         res["user"] = user.serialize()
-        
-        res.add_control_post("fitnessbuddy:add-stats", "Post new stats", url_for("api.userstats", user=user), Stats.json_schema())
+
+        res.add_control_post("fitnessbuddy:add-stats", "Post new stats",
+                             url_for("api.userstats", user=user), Stats.json_schema())
 
         #connect to rabbitMQ
         connection = pika.BlockingConnection(
@@ -104,7 +109,7 @@ class UserStats(Resource):
                 host="193.167.189.95",
                 port=5672,
                 virtual_host="ryhma-jll-vhost",
-                credentials=pika.PlainCredentials(usr, pwd),
+                credentials=pika.PlainCredentials(USR, PWD),
                 ssl_options=pika.SSLOptions(context)
             )
         )

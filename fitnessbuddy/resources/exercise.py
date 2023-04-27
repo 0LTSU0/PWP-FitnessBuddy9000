@@ -31,7 +31,8 @@ class ExerciseCollection(Resource):
         res["exercises"] = body
         res.add_control("self", url_for("api.exercisecollection", user=user))
         res.add_control("fitnessbuddy:user", url_for("api.useritem", user=user))
-        res.add_control_post("fitnessbuddy:add-exercise", "fitnessbuddy:add-exercise", url_for("api.exercisecollection", user=user), Exercise.json_schema())
+        res.add_control_post("fitnessbuddy:add-exercise", "fitnessbuddy:add-exercise",
+                             url_for("api.exercisecollection", user=user), Exercise.json_schema())
 
         return Response(json.dumps(res), 200, mimetype=MASON)
 
@@ -55,7 +56,7 @@ class ExerciseCollection(Resource):
         #Add entry to db
         db.session.add(exrc)
         db.session.commit()
-        
+
         res = MasonBuilder()
         res.add_control("self", url_for("api.exerciseitem", user=exrc.user, exercise=exrc))
 
@@ -73,13 +74,17 @@ class ExerciseItem(Resource):
         if user != exercise.user:
             raise BadRequest(description=
                 "Requested exercise does not correspond to requested user")
-        
+
         res = MasonBuilder()
         res["exercise"] = exercise.serialize()
         res.add_control("self", url_for("api.exerciseitem", user=user, exercise=exercise))
-        res.add_control("fitnessbuddy:exercises-all", url_for("api.exercisecollection", user=user), title="All exercises")
-        res.add_control_delete("Delete exercise", url_for("api.exerciseitem", user=exercise.user, exercise=exercise))
-        res.add_control_put("Edit exercise", url_for("api.exerciseitem", user=exercise.user, exercise=exercise), Exercise.json_schema())
+        res.add_control("fitnessbuddy:exercises-all", url_for("api.exercisecollection",
+                                                              user=user), title="All exercises")
+        res.add_control_delete("Delete exercise", url_for("api.exerciseitem",
+                                                          user=exercise.user, exercise=exercise))
+        res.add_control_put("Edit exercise", url_for("api.exerciseitem",
+                                                     user=exercise.user, exercise=exercise),
+                                                     Exercise.json_schema())
         return Response(json.dumps(res), 200, mimetype=MASON)
 
     def put(self, user, exercise):

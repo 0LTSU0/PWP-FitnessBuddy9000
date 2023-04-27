@@ -56,7 +56,7 @@ class UserCollection(Resource):
         #add new user to database
         db.session.add(user)
         db.session.commit()
-        
+
         res = MasonBuilder()
         res.add_control("self", url_for("api.useritem", user=user))
 
@@ -74,8 +74,10 @@ class UserItem(Resource):
         res = MasonBuilder()
         res["user"] = user.serialize()
         res.add_control("self", url_for("api.useritem", user=user))
-        res.add_control("fitnessbuddy:exercises-all", url_for("api.exercisecollection", user=user), title="All exercises")
-        res.add_control("fitnessbuddy:measurements-all", url_for("api.measurementscollection", user=user), title="All measurements")
+        res.add_control("fitnessbuddy:exercises-all",
+                        url_for("api.exercisecollection", user=user), title="All exercises")
+        res.add_control("fitnessbuddy:measurements-all",
+                        url_for("api.measurementscollection", user=user), title="All measurements")
         res.add_control("fitnessbuddy:users-all", url_for("api.usercollection"), title="All users")
         res.add_control("fitnessbuddy:stats", url_for("api.userstats", user=user), title="Stats")
         res.add_control_delete("Delete user", url_for("api.useritem", user=user))

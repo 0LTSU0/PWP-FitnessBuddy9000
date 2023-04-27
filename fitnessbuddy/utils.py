@@ -66,7 +66,7 @@ class MasonBuilder(dict):
 
         self["@controls"][ctrl_name] = kwargs
         self["@controls"][ctrl_name]["href"] = href
-    
+
     """
     Class for building Mason objects, taken mostly from course exercise examples 
     """
@@ -75,13 +75,13 @@ class MasonBuilder(dict):
         Utility method for adding POST type controls. The control is
         constructed from the method's parameters. Method and encoding are
         fixed to "POST" and "json" respectively.
-        
+
         : param str ctrl_name: name of the control (including namespace if any)
         : param str href: target URI for the control
         : param str title: human-readable title for the control
         : param dict schema: a dictionary representing a valid JSON schema
         """
-    
+
         self.add_control(
             ctrl_name,
             href,
@@ -90,13 +90,13 @@ class MasonBuilder(dict):
             title=title,
             schema=schema
         )
-    
+
     def add_control_put(self, title, href, schema):
         """
         Utility method for adding PUT type controls. The control is
         constructed from the method's parameters. Control name, method and
         encoding are fixed to "edit", "PUT" and "json" respectively.
-        
+
         : param str href: target URI for the control
         : param str title: human-readable title for the control
         : param dict schema: a dictionary representing a valid JSON schema
@@ -121,7 +121,7 @@ class MasonBuilder(dict):
         : param str href: target URI for the control
         : param str title: human-readable title for the control
         """
-        
+
         self.add_control(
             "fitnessbuddy:delete",
             href,

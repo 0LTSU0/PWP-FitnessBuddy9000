@@ -7,11 +7,10 @@ from datetime import datetime
 from flask import Response, request
 from flask import url_for
 from flask_restful import Resource
-from fitnessbuddy.models import db, Measurements
-from fitnessbuddy.utils import MasonBuilder
 from jsonschema import validate, ValidationError
 from werkzeug.exceptions import UnsupportedMediaType, BadRequest
-from sqlalchemy.exc import IntegrityError
+from fitnessbuddy.models import db, Measurements
+from fitnessbuddy.utils import MasonBuilder
 
 MASON = "application/vnd.mason+json"
 
@@ -34,7 +33,9 @@ class MeasurementsCollection(Resource):
         res["measurements"] = body
         res.add_control("self", url_for("api.measurementscollection", user=user))
         res.add_control("fitnessbuddy:user", url_for("api.useritem", user=user))
-        res.add_control_post("fitnessbuddy:add-measurement", "fitnessbuddy:addmeasurement", url_for("api.measurementscollection", user=user), Measurements.json_schema())
+        res.add_control_post("fitnessbuddy:add-measurement", "fitnessbuddy:addmeasurement",
+                             url_for("api.measurementscollection", user=user),
+                             Measurements.json_schema())
 
         # return users
         return Response(json.dumps(res), 200, mimetype=MASON)
@@ -62,7 +63,8 @@ class MeasurementsCollection(Resource):
         db.session.commit()
 
         res = MasonBuilder()
-        res.add_control("self", url_for("api.measurementsitem", user=measurement.user, measurements=measurement))
+        res.add_control("self", url_for("api.measurementsitem",
+                                        user=measurement.user, measurements=measurement))
 
         return Response(json.dumps(res), 201, mimetype=MASON)
 
@@ -79,13 +81,18 @@ class MeasurementsItem(Resource):
             raise BadRequest(
                 description="Requested measurement does not correspond to requested user"
             )
-        
+
         res = MasonBuilder()
         res["measurement"] = measurements.serialize()
-        res.add_control("self", url_for("api.measurementsitem", user=measurements.user, measurements=measurements))
-        res.add_control("fitnessbuddy:measurements-all", url_for("api.measurementscollection", user=user), title="All measurements")
-        res.add_control_delete("Delete measurements", url_for("api.measurementsitem", user=measurements.user, measurements=measurements))
-        res.add_control_put("Edit measurements", url_for("api.measurementsitem", user=measurements.user, measurements=measurements), Measurements.json_schema())
+        res.add_control("self", url_for("api.measurementsitem", user=measurements.user,
+                                        measurements=measurements))
+        res.add_control("fitnessbuddy:measurements-all", url_for("api.measurementscollection",
+                                                user=user), title="All measurements")
+        res.add_control_delete("Delete measurements", url_for("api.measurementsitem",
+                                                user=measurements.user, measurements=measurements))
+        res.add_control_put("Edit measurements", url_for("api.measurementsitem",
+                                                user=measurements.user, measurements=measurements),
+                                                Measurements.json_schema())
         return Response(json.dumps(res), 200, mimetype=MASON)
 
     def put(self, user, measurements):
