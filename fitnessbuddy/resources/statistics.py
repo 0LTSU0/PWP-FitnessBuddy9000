@@ -35,7 +35,7 @@ with open(credentials_file, encoding="utf-8") as f:
 
 class UserStats(Resource):
     """
-    Resource for user's statistics. Methods: get, post, delete
+    Resource for user's statistics. Methods: get, post
     """
     def get(self, user):
         """
@@ -73,16 +73,10 @@ class UserStats(Resource):
         db.session.add(stats)
         db.session.commit()
 
-        return Response(status=204)
+        res = MasonBuilder()
+        res.add_control("self", url_for("api.userstats", user=user))
 
-    def delete(self, user):
-        """
-        Method for deleting all existing statistics
-        """
-        for item in Stats.query.filter_by(user=user).all():
-            db.session.delete(item)
-        db.session.commit()
-        return Response(status=204)
+        return Response(json.dumps(res), 201, mimetype=MASON)
 
     def send_task(self, user):
         #get current data from user

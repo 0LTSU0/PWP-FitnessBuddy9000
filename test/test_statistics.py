@@ -93,7 +93,12 @@ def test_stats_post(client):
 
     #post to valid url with valid body
     resp = client.post(resource_url_valid, json=valid_body)
-    assert resp.status_code == 204
+    assert resp.status_code == 201
+    
+    #Verify controls
+    controls = json.loads(resp.data)["@controls"]
+    expected = {'self': {'href': '/api/users/1/stats/'}}
+    assert controls == expected
 
     #Invalid data to valid url
     resp = client.post(resource_url_valid, json=invalid_body)
@@ -124,20 +129,4 @@ def test_stats_get(client):
 
     #Get from invalid url
     resp = client.get(resource_url_invalid)
-    assert resp.status_code == 404
-
-
-def test_stats_delete(client):
-    """
-    Function for testing delete method on Stats resource
-    """
-    resource_url_valid = "/api/users/1/stats/"
-    resource_url_invalid = "/api/users/21311/stats/"
-
-    #Delete existing stats
-    resp = client.delete(resource_url_valid)
-    assert resp.status_code == 204
-
-    #Try to delete from invalid url
-    resp = client.delete(resource_url_invalid)
     assert resp.status_code == 404

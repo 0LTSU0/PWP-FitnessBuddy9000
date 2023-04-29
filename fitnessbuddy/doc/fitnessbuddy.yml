@@ -86,6 +86,30 @@ components:
       - date
       - user_id
       type: object
+    Stats:
+      properties:
+        date:
+          description: Datetime when these stats were generated
+          type: string
+        user_id:
+          description: User id
+          type: number
+        total_exercises:
+          description: Total amount of exercises this user has done
+          type: number
+        daily_exercises:
+          description: Average number of exercises per day
+          type: number
+        daily_calories_in:
+          description: Average number of calories eaten per day
+          type: number
+        daily_calories_out:
+          description: Average number of calories burnt per day
+          type: number
+      required:
+      - date
+      - user_id
+      type: object
 info:
   title: FitnessBuddy9000
   version: 0.0.1
@@ -769,5 +793,58 @@ paths:
       responses:
         '204':
           description: Successfully deleted measurements
+        '404':
+          description: Not found
+  /users/{user}/stats/:
+    parameters:
+        - in: path
+          name: user
+          schema:
+            type: integer
+          required: true
+          description: User id
+    get:
+      description: Get user statistics
+      responses:
+        '202':
+          description: Successfully send new task to queue for generating new stats
+        '404':
+          description: Not found
+    post:
+      description: Add new statistics
+      requestBody:
+        description: JSON document that contains statistics information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Stats'
+            example:
+              date: "2023-02-11T13:01:56"
+              user_id: 1
+              total_exercises: 56.0
+              daily_exercises: 0.92
+              daily_calories_in: 2523.0
+              daily_calories_out: 2553.0
+      responses:
+        '201':
+          description: Successfully added new statistics
+          content:
+            application/vnd.mason+json:
+              example:
+                "@controls":
+                  self:
+                    href: /api/users/1/stats/
+        '400':
+          description: Invalid request body
+          content:
+            json:
+              example:
+                message: The browser (or proxy) sent a request that this server could not understand.
+        '415':
+          description: Request body isn't JSON
+          content:
+            json:
+              example:
+                message: The server does not support the media type transmitted in the request.
         '404':
           description: Not found
