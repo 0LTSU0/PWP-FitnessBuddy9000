@@ -19,7 +19,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
 
-measurement_schema = {'type': 'object', 'required': ['date', 'user_id'], 'properties': {
+measurement_schema = {'type': 'object', 'required': ['date'], 'properties': {
     'date': {'description': 'Datetime of the measurement as a string', 'type': 'string'}, 
     'user_id': {'description': 'User id', 'type': 'number'}, 
     'weight': {'description': 'Weight measurement', 'type': 'number'}, 

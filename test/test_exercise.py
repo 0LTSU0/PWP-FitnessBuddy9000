@@ -25,7 +25,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 
 
 exercise_schema = {'type': 'object', 
-                   'required': ['name', 'date', 'user_id'], 
+                   'required': ['name', 'date'], 
                    'properties': {'name': {'description': 'Name of the exercise', 'type': 'string'}, 
                                   'date': {'description': 'Datetime of the exercise as a string', 'type': 'string'}, 
                                   'user_id': {'description': 'User id', 'type': 'number'}, 
