@@ -38,9 +38,9 @@ class Exercise(db.Model):
         Function for deserializing exercise data item
         """
         self.name = doc["name"]
-        self.duration = doc["duration"]
+        self.duration = doc.get("duration")
         self.date = datetime.fromisoformat(str(doc["date"]))
-        self.user_id = doc["user_id"]
+        self.user_id = doc.get("user_id")
 
     @staticmethod
     def json_schema():
@@ -49,7 +49,7 @@ class Exercise(db.Model):
         """
         schema = {
             "type": "object",
-            "required": ["name", "date", "user_id"]
+            "required": ["name", "date"]
         }
         props = schema["properties"] = {}
         props["name"] = {
@@ -168,10 +168,10 @@ class Measurements(db.Model):
         Function for deserializing measurements data item
         """
         self.date = datetime.fromisoformat(str(doc["date"]))
-        self.weight = doc["weight"]
-        self.calories_in = doc["calories_in"]
-        self.calories_out = doc["calories_out"]
-        self.user_id = doc["user_id"]
+        self.weight = doc.get("weight")
+        self.calories_in = doc.get("calories_in")
+        self.calories_out = doc.get("calories_out")
+        self.user_id = doc.get("user_id")
 
     @staticmethod
     def json_schema():
@@ -180,7 +180,7 @@ class Measurements(db.Model):
         """
         schema = {
             "type": "object",
-            "required": ["date", "user_id"]
+            "required": ["date"]
         }
         props = schema["properties"] = {}
         props["date"] = {

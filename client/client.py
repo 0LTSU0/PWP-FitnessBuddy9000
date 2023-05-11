@@ -264,10 +264,13 @@ def submit(inputframe, href):
         for item in frame.winfo_children():
             if i % 2 == 0: #label
                 stripped = item.cget("text").strip(" ").strip("(*):")
-                post[stripped] = None
+                #post[stripped] = None
                 prev_label = stripped
             else: #user inputted value
                 val = item.get()
+                if not val: #if input is empty string
+                    i += 1
+                    continue
                 if href.get("schema").get("properties").get(prev_label).get("type") == "number":
                     try:
                         val = float(val)
