@@ -113,18 +113,18 @@ class StatsPage(tk.Frame):
         
         bframe = tk.Frame(self)
         tk.Button(bframe, text="Delete user",
-                  command=lambda: self.delete_user(master)).pack(padx=10, side="bottom")
-        bframe.pack()
+                  command=lambda: self.delete_user(statframe)).pack(padx=10, side="bottom")
+        bframe.pack(pady=40)
 
     def delete_user(self, statframe):
         href = f"{API}{USER}"
         res = req.delete(href)
         if res.status_code != 204:
-            res = res.get("message").replace("\n", "")
-            tk.Label(self.errframe, text=res, fg='#ff1100',
+            tk.Label(statframe, text="User already deleted", fg='#ff1100',
                      wraplength=self.winfo_width()).pack(padx=20)
         else:
-            statframe.switch_frame(StartPage)
+            self.master.switch_frame(StartPage)
+        #statframe.pack()
 
 
     def update_stats(self, statframe):
