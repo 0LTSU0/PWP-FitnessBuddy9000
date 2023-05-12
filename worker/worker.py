@@ -50,12 +50,11 @@ def handle_task(channel, method, properties, body):
         href = API_SERVER + task["@controls"]["fitnessbuddy:add-stats"]["href"]
         print("Body: \n", task, "\n")
         daily_exercise, avg_calories_in, avg_calories_out = compute_stats(task)
-        #TEMP test that post works
-        #these stats should be calculated from the input json
+        #calculate new stats
         new_stats = {
             "date": datetime.isoformat(datetime.now()),
             "user_id": task["user"]["id"],
-            "total_exercises": len(task["measurements"]),
+            "total_exercises": len(task["exercises"]),
             "daily_exercises": daily_exercise,
             "daily_calories_in": avg_calories_in,
             "daily_calories_out": avg_calories_out
