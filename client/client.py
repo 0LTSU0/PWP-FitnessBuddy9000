@@ -110,6 +110,21 @@ class StatsPage(tk.Frame):
         tk.Button(aframe, text="Add Measurement",
                   command=lambda: master.switch_frame(AddMeasurement)).pack(padx=10, side="left")
         aframe.pack()
+        
+        bframe = tk.Frame(self)
+        tk.Button(bframe, text="Delete user",
+                  command=lambda: self.delete_user(master)).pack(padx=10, side="bottom")
+        bframe.pack()
+
+    def delete_user(self, statframe):
+        href = f"{API}{USER}"
+        res = req.delete(href)
+        if res.status_code != 204:
+            res = res.get("message").replace("\n", "")
+            tk.Label(self.errframe, text=res, fg='#ff1100',
+                     wraplength=self.winfo_width()).pack(padx=20)
+        else:
+            statframe.switch_frame(StartPage)
 
 
     def update_stats(self, statframe):
