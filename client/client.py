@@ -13,6 +13,7 @@ from pika_listener import STATS, listen_notifications
 API = "http://127.0.0.1:5000/api/users/" #api entrypoint
 API_ADDR = "http://127.0.0.1:5000/" #plain address for use with hypermedia controls
 USER = None
+USER_INFO = None
 HREFS = None
 
 class SampleApp(tk.Tk):
@@ -76,6 +77,10 @@ class StartPage(tk.Frame):
         elif selection:
             global USER
             USER = self.users.get(listbox.get(selection))
+            #get user information
+            href = f"{API}{USER}"
+            global USER_INFO
+            USER_INFO = req.get(href).json()
             self.master.switch_frame(StatsPage)
 
 
@@ -100,8 +105,8 @@ class StatsPage(tk.Frame):
 
         #Use hypermedia to find hrefs for adding measurements and exercises
         global HREFS
-        HREFS = self.find_hrefs(["fitnessbuddy:add-exercise",
-                                 "fitnessbuddy:add-measurement", "fitnessbuddy:stats"])
+        HREFS = self.find_hrefs(["fitnessbuddy:add-exercise", "fitnessbuddy:add-measurement", 
+                                 "fitnessbuddy:stats", "edit"])
 
         #Add buttons for the actions
         aframe = tk.Frame(self)
@@ -110,11 +115,16 @@ class StatsPage(tk.Frame):
         tk.Button(aframe, text="Add Measurement",
                   command=lambda: master.switch_frame(AddMeasurement)).pack(padx=10, side="left")
         aframe.pack()
-        
+
+        cframe = tk.Frame(self)
+        tk.Button(cframe, text="Edit user",
+                  command=lambda: master.switch_frame(EditUser)).pack(padx=10, side="bottom")
+        cframe.pack(pady=40)
+
         bframe = tk.Frame(self)
         tk.Button(bframe, text="Delete user",
                   command=lambda: self.delete_user(statframe)).pack(padx=10, side="bottom")
-        bframe.pack(pady=40)
+        bframe.pack()
 
     def delete_user(self, statframe):
         href = f"{API}{USER}"
@@ -166,6 +176,15 @@ class StatsPage(tk.Frame):
         """
         ret = {}
         controls = req.get(f"{API}{USER}/").json().get("@controls")
+        #first find edit user control
+        for control in controls.values():
+            if control.get("title") == "Edit user":
+                res = req.get(API_ADDR + control.get("href")).json().get("@controls")
+                for target in targets:
+                    if target in res.keys():
+                        ret[target] = res.get(target)
+                        targets.remove(target)
+        #then others
         for control in controls.values():
             if not control.get("method") or control.get("method") == "GET":
                 res = req.get(API_ADDR + control.get("href")).json().get("@controls")
@@ -264,13 +283,58 @@ class AddMeasurement(tk.Frame):
         else:
             tk.Label(self.errframe, text="Measurements added successfully",
                 fg='#00EB00', wraplength=self.winfo_width()).pack(padx=20)
+            
+class EditUser(tk.Frame):
+    '''
+    Screen for editing user information
+    '''
+    def __init__(self, master):
+        tk.Frame.__init__(self, master)
+        tk.Label(self, text="Edit user",
+                 font=("Arial", 25, "bold")).pack(side="top", fill="x", pady=20)
+
+        #Generate form based on schema
+        inputframe = tk.Frame(self)
+        inputframe = generate_form(inputframe, HREFS.get("edit"), editing_user=True)
+        inputframe.pack()
+
+        sframe = tk.Frame(self)
+        self.errframe = tk.Frame(self)
+        tk.Button(sframe, text="Back to stats",
+            command=lambda: master.switch_frame(StatsPage)).pack(pady=20, padx=10, side="left")
+        tk.Button(sframe, text="Submit",
+            command=lambda: self.submit(inputframe,
+            HREFS.get("edit"))).pack(pady=20, padx=10, side="left")
+        sframe.pack()
+        self.errframe.pack()
+    
+    def submit(self, inputframe, href):
+        """
+        Handler for submit button
+        """
+        success, response = submit(inputframe, href, method="put")
+        #Clear possible error messages
+        for child in self.errframe.winfo_children():
+            child.destroy()
+
+        #Flash new message
+        if not success:
+            response = response.get("message").replace("\n", "")
+            tk.Label(self.errframe, text=response, fg='#ff1100',
+                     wraplength=self.winfo_width()).pack(padx=20)
+        else:
+            tk.Label(self.errframe, text="User edited successfully",
+                fg='#00EB00', wraplength=self.winfo_width()).pack(padx=20)
+            #get edited user values
+            href = f"{API}{USER}"
+            global USER_INFO
+            USER_INFO = req.get(href).json()
 
 
-def submit(inputframe, href):
+def submit(inputframe, href, method="post"):
     """
-    Makes a post request to specified href based on stuff in inputframe
+    Makes a post or put request to specified href based on stuff in inputframe
     """
-
     i = 0
     prev_label = None
     post = {}
@@ -293,19 +357,23 @@ def submit(inputframe, href):
                         pass #api will give error message so just ignore for now
                 post[prev_label] = val
             i += 1
-
-    res = req.post(API_ADDR + href.get("href"), json=post)
-    if res.status_code != 201:
-        return False, json.loads(res.content.decode())
+    #method should be post by default
+    if method == "post":
+        res = req.post(API_ADDR + href.get("href"), json=post)
+        if res.status_code != 201:
+            return False, json.loads(res.content.decode())
+    elif method == "put":
+        res = req.put(API_ADDR + href.get("href"), json=post)
+        if res.status_code != 204:
+            return False, json.loads(res.content.decode())
     
     return True, ""
 
 
-def generate_form(iframe, instr):
+def generate_form(iframe, instr, editing_user=False):
     """
-    Generates measurement/exercise adding screen based on stuff in schema
+    Generates measurement/exercise adding screen and user editing screen based on stuff in schema
     """
-
     labels = list(instr.get("schema").get("properties").keys())
 
     for item in instr.get("schema").get("required"): #first add required fields
@@ -314,8 +382,12 @@ def generate_form(iframe, instr):
         labels.remove(item)
         tk.Label(sframe, text=label.ljust(30, " ")).pack(side="left")
         tinput = tk.Entry(sframe, width = 30)
-        if item == "date": #prefill date because format
+        #if adding new measurement/exercise prefill date because format
+        if item == "date":
             tinput.insert(0, datetime.now().isoformat())
+        #if editing user prefill old user values
+        if editing_user:
+            tinput.insert(0, USER_INFO['user'][item])
         tinput.pack(side="left")
         sframe.pack()
     for item in labels: #then optional
